@@ -1,10 +1,7 @@
 import { EntityNotFoundError } from 'typeorm';
 import { AppDataSource } from '../../datasource/data-source';
 import { Shelter } from '../../entity/Shelters';
-
-interface Variant {
-	[key: string]: string | Buffer;
-}
+import { Variant } from '../../utils';
 
 export default class ShelterController {
 	
@@ -24,21 +21,17 @@ export default class ShelterController {
 		const repository = AppDataSource.getRepository(Shelter);
 
 		console.debug('Loading one shelter from database');
-		const entity = await repository.findOneBy({id: id});
+		const entity = await repository.findOneByOrFail({id: id});
 
 		return entity;
 	}
 
-	async create(name: string, email: string, password: string){
-		const shelter = new Shelter();
-		shelter.name = name;
-		shelter.email = email;
-		shelter.password = password;
+	async create(shelter: Shelter){
 
 		const repository = AppDataSource.getRepository(Shelter);
 		await repository.save(shelter);
 
-		console.log(`Saved a new shelter with id ${shelter.id}`);
+		console.debug(`Saved a new user with id ${shelter.id}`);
 
 		return shelter;
 	}
@@ -50,12 +43,10 @@ export default class ShelterController {
 
 		if(!exist)
 			throw new EntityNotFoundError(Shelter, {id: id});
-		
-		shelter.id = id;
 
 		await repository.save(shelter);
 	
-		console.log(`update shelter ${shelter.id}`);
+		console.debug(`update user ${shelter.id}`);
 
 		return shelter;
 	}
@@ -63,8 +54,9 @@ export default class ShelterController {
 
 	async updateSome(body: object, id: string){
 		const repository = AppDataSource.getRepository(Shelter);
-		const shelter = await repository.findOneByOrFail({id: id});
-
+		
+		const  shelter = await repository.findOneByOrFail({id: id});
+		
 		for (const key of Object.keys(body)) {
 			(shelter as unknown as Variant)[key] = (body as Variant)[key];
 		}
@@ -73,7 +65,7 @@ export default class ShelterController {
 		
 		await repository.save(shelter);
 	
-		console.log(`update shelter ${shelter.id}`);
+		console.debug(`update user ${shelter.id}`);
 
 		return shelter;
 	}
@@ -83,7 +75,9 @@ export default class ShelterController {
 		const repository = AppDataSource.getRepository(Shelter);
 
 		const shelter = await repository.findOneByOrFail({id: id});
-
+	
 		await repository.remove(shelter);
+		
+		console.debug(`delete user ${shelter.id}`);
 	}
 } 

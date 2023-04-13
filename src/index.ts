@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import { AppDataSource } from './datasource/data-source';
 import { router } from './routers';
+import { HandleError, HandleTypeORMError } from './ErrorHandler';
 
 dotenv.config();
 export const app = express();
@@ -15,6 +16,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use(router);
+
+app.use(HandleTypeORMError);
+app.use(HandleError);
 
 app.listen(process.env.DEV_PORT, ()=> {
 	console.log(`Server is on! ${process.env.BASE_URL}:${process.env.DEV_PORT}`);

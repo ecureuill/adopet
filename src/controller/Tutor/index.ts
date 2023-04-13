@@ -1,11 +1,7 @@
 import { EntityNotFoundError } from 'typeorm';
 import { AppDataSource } from '../../datasource/data-source';
 import { Tutor } from '../../entity/Tutors';
-
-interface Variant {
-	[key: string]: string | Buffer;
-}
-
+import { Variant } from '../../utils';
 
 export default class TutorController {
 	
@@ -25,17 +21,12 @@ export default class TutorController {
 		const repository = AppDataSource.getRepository(Tutor);
 
 		console.debug('Loading one tutor from database');
-		const entity = await repository.findOneBy({id: id});
+		const entity = await repository.findOneByOrFail({id: id});
 
 		return entity;
 	}
 
-	async create(name: string, email: string, password: string){
-		const tutor = new Tutor();
-		tutor.name = name;
-		tutor.email = email;
-		tutor.password = password;
-
+	async create(tutor: Tutor){
 
 		const repository = AppDataSource.getRepository(Tutor);
 		await repository.save(tutor);
@@ -52,8 +43,6 @@ export default class TutorController {
 
 		if(!exist)
 			throw new EntityNotFoundError(Tutor, {id: id});
-		
-		tutor.id = id;
 
 		await repository.save(tutor);
 	

@@ -1,165 +1,86 @@
 import { Request, Response } from 'express';
 
 import ShelterController from '../../controller/Shelter';
-import { hasRequiredValues, isValidBody, isValidID } from '../utils';
-import { EntityNotFoundError } from 'typeorm';
+import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../../utils/validations';
 
 export default class ShelterRouter {
 	async getAll(request: Request, response: Response){
-		try{
-			const controller = new ShelterController();
-			const result = await controller.getAll();
+		const controller = new ShelterController();
+		const result = await controller.getAll();
 
-			if(result.count === 0)
-				return response.status(404).json({mensagem: 'Não encontrado'});
+		if(result.count === 0)
+			return response.status(404).json({mensagem: 'Não encontrado'});
 
-			return response.status(200).json(result);
-		}
-		catch(error){
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(200).json(result);
 	}
 
 	async getOneById(request: Request, response: Response){
-		try{
-			const controller = new ShelterController();
+		const controller = new ShelterController();
 
-			const { id } = request.params;
+		const { id } = request.params;
 
-			const { validUUID, invalidUUIDMessage } = isValidID(id); 
-			if(!validUUID)
-				return response.status(400).json({mensagem: invalidUUIDMessage});
+		hasValidID(id); 
+		
+		const result = await controller.getOneById(id);
 
-			const result = await controller.getOneById(id);
-
-			if(result === null)
-				return response.status(404).json({mensagem: 'Não encontrado'});
-
-			return response.status(200).json(result);
-		}
-		catch(error){
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(200).json(result);
 	}
 
 	async create(request: Request, response: Response){
-		try {
-			const controller = new ShelterController();
+		const controller = new ShelterController();
 
-			const { validBody, invalidBodyMessage } = isValidBody(request.body);
+		hasBody(request.body);
 
-			if(!validBody)
-				return response.status(400).json({mensagem: invalidBodyMessage});
+		hasRequiredFields(request.body, ['name', 'password', 'email']);
 
-			const { name, password, email } = request.body;
+		const result = await controller.create(request.body);
 
-			const {validValue, invalidValueMessage} = hasRequiredValues( name, password, email);
-
-			if(!validValue)
-				return response.status(400).json({mensagem: invalidValueMessage});
-
-			const result = await controller.create(name, email, password);
-
-			return response.status(201).json(result);
-		}
-		catch(error){
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(201).json(result);
 	}
 
 	async updateAll(request: Request, response: Response){
-		try {
-			const controller = new ShelterController();
+		const controller = new ShelterController();
 
-			const { id } = request.params;
+		const { id } = request.params;
 
-			const { validUUID, invalidUUIDMessage } = isValidID(id); 
-			if(!validUUID)
-				return response.status(400).json({mensagem: invalidUUIDMessage});
+		hasValidID(id); 
+		hasBody(request.body);
+		hasRequiredFields(request.body, ['name', 'password', 'email']);
+		idReplacememtIsNotAllowed(request.body.id, id);
 
-			const { validBody, invalidBodyMessage } = isValidBody(request.body);
-			
-			if(!validBody)
-				return response.status(400).json({mensagem: invalidBodyMessage});
+		const result = await controller.updateAll(request.body, id);
 
-			const { name, password, email } = request.body;
-
-			const {validValue, invalidValueMessage} = hasRequiredValues( name, password, email);
-
-			if(!validValue)
-				return response.status(400).json({mensagem: invalidValueMessage});
-
-			const result = await controller.updateAll(request.body, id);
-
-			return response.status(200).json(result);
-		}
-		catch(error){
-			if (error instanceof EntityNotFoundError)
-				return response.status(404).json({mensagem: 'Não encontrado'});
-
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(200).json(result);
 	}
 
 	async updateSome(request: Request, response: Response){
-		try {
-			const controller = new ShelterController();
+		const controller = new ShelterController();
 
-			const { id } = request.params;
+		const { id } = request.params;
 
-			const { validUUID, invalidUUIDMessage } = isValidID(id); 
-			if(!validUUID)
-				return response.status(400).json({mensagem: invalidUUIDMessage});
+		hasValidID(id); 
+		hasBody(request.body);
 
-			const { validBody, invalidBodyMessage } = isValidBody(request.body);
-			
-			if(!validBody)
-				return response.status(400).json({mensagem: invalidBodyMessage});
+		hasValidValue(request.body, 'name');
+		hasValidValue(request.body, 'password');
+		hasValidValue(request.body, 'email');
+		idReplacememtIsNotAllowed(request.body.id, id);
 
-			if(request.body.email?.length === 0)
-				return response.status(400).json({mensagem: 'invalid email'});
+		const result = await controller.updateSome(request.body, id);
 
-			if(request.body.name?.length === 0)
-				return response.status(400).json({mensagem: 'invalid name'});
-
-			if(request.body.password?.length === 0)
-				return response.status(400).json({mensagem: 'invalid password'});
-
-			const result = await controller.updateSome(request.body, id);
-
-			return response.status(200).json(result);
-		}
-		catch(error){
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(200).json(result);
 	}
 
 	async delete(request: Request, response: Response) {
-		try{
-			const controller = new ShelterController();
+		const controller = new ShelterController();
 
-			const { id } = request.params;
+		const { id } = request.params;
 
-			const { validUUID, invalidUUIDMessage } = isValidID(id); 
-			if(!validUUID)
-				return response.status(400).json({mensagem: invalidUUIDMessage});
+		hasValidID(id); 
 
-			const result = await controller.delete(id);
+		const result = await controller.delete(id);
 
-			return response.status(200).json(result);
-		}
-		catch (error){
-			if (error instanceof EntityNotFoundError)
-				return response.status(404).json({mensagem: 'Não encontrado'});
-
-			console.error(error);
-			return response.status(500).json();
-		}
+		return response.status(200).json(result);
 	}
 
 }
