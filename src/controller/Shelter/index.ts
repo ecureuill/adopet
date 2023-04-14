@@ -9,7 +9,11 @@ export default class ShelterController {
 		const repository = AppDataSource.getRepository(Shelter);
 
 		console.debug('Loading all shelters from database');
-		const [entities, count] = await repository.findAndCount();
+		const [entities, count] = await repository
+			.createQueryBuilder('shelter')
+			.leftJoinAndSelect('shelter.pets', 'pets', 'pets.adopted = :isAdopted', {isAdopted: false})
+			.getManyAndCount();
+
 		console.debug(entities);
 		console.debug(`count ${count}`);
 
@@ -21,7 +25,11 @@ export default class ShelterController {
 		const repository = AppDataSource.getRepository(Shelter);
 
 		console.debug('Loading one shelter from database');
-		const entity = await repository.findOneByOrFail({id: id});
+		const entity = await repository
+			.createQueryBuilder('shelter')
+			.leftJoinAndSelect('shelter.pets', 'pets', 'pets.adopted = :isAdopted', {isAdopted: false})
+			.where({ id: id})
+			.getOneOrFail();
 
 		return entity;
 	}
@@ -50,7 +58,6 @@ export default class ShelterController {
 
 		return shelter;
 	}
-
 
 	async updateSome(body: object, id: string){
 		const repository = AppDataSource.getRepository(Shelter);
