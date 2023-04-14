@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import ShelterController from '../../controller/Shelter';
-import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../../utils/validations';
+import ShelterController from '../controller/shelter.controller';
+import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../utils/validations';
 
 export default class ShelterRouter {
 	async getAll(request: Request, response: Response){

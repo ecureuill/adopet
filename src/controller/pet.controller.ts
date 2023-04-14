@@ -1,12 +1,12 @@
 import { EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '../../datasource/data-source';
-import { Pet } from '../../entity/Pets';
-import { Variant } from '../../utils';
+import { dataSource } from '../database/datasource/data-source';
+import { Pet } from '../entities/Pet';
+import { Variant } from '../utils';
 
 export default class PetController {
 	
 	async getAll(){
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 
 		console.debug('Loading all pets from database');
 		const [entities, count] = await repository.findAndCount();
@@ -18,7 +18,7 @@ export default class PetController {
 
 	async getOneById(id: string){
 
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 
 		console.debug('Loading one pet from database');
 		const entity = await repository.findOneByOrFail({id: id});
@@ -28,7 +28,7 @@ export default class PetController {
 
 	async create(pet: Pet){
 
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 		await repository.save(pet);
 
 		console.debug(`Saved a new user with id ${pet.id}`);
@@ -37,7 +37,7 @@ export default class PetController {
 	}
 
 	async updateAll(pet: Pet, id: string){
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 	
 		const exist = await repository.exist({where: {id: id}});
 
@@ -53,7 +53,7 @@ export default class PetController {
 
 
 	async updateSome(body: object, id: string){
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 		
 		const  pet = await repository.findOneByOrFail({id: id});
 		
@@ -72,7 +72,7 @@ export default class PetController {
 
 	async delete(id: string){
 		
-		const repository = AppDataSource.getRepository(Pet);
+		const repository = dataSource.getRepository(Pet);
 
 		const pet = await repository.findOneByOrFail({id: id});
 	

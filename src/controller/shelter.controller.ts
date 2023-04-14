@@ -1,12 +1,12 @@
 import { EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '../../datasource/data-source';
-import { Shelter } from '../../entity/Shelters';
-import { Variant } from '../../utils';
+import { dataSource } from '../database/datasource/data-source';
+import { Shelter } from '../entities/Shelter';
+import { Variant } from '../utils';
 
 export default class ShelterController {
 	
 	async getAll(){
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 
 		console.debug('Loading all shelters from database');
 		const [entities, count] = await repository
@@ -22,7 +22,7 @@ export default class ShelterController {
 
 	async getOneById(id: string){
 
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 
 		console.debug('Loading one shelter from database');
 		const entity = await repository
@@ -36,7 +36,7 @@ export default class ShelterController {
 
 	async create(shelter: Shelter){
 
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 		await repository.save(shelter);
 
 		console.debug(`Saved a new user with id ${shelter.id}`);
@@ -45,7 +45,7 @@ export default class ShelterController {
 	}
 
 	async updateAll(shelter: Shelter, id: string){
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 	
 		const exist = await repository.exist({where: {id: id}});
 
@@ -60,7 +60,7 @@ export default class ShelterController {
 	}
 
 	async updateSome(body: object, id: string){
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 		
 		const  shelter = await repository.findOneByOrFail({id: id});
 		
@@ -79,7 +79,7 @@ export default class ShelterController {
 
 	async delete(id: string){
 		
-		const repository = AppDataSource.getRepository(Shelter);
+		const repository = dataSource.getRepository(Shelter);
 
 		const shelter = await repository.findOneByOrFail({id: id});
 	

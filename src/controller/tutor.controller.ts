@@ -1,12 +1,13 @@
+
 import { EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '../../datasource/data-source';
-import { Tutor } from '../../entity/Tutors';
-import { Variant } from '../../utils';
+import { dataSource } from '../database/datasource/data-source';
+import { Tutor } from '../entities/Tutor';
+import { Variant } from '../utils';
 
 export default class TutorController {
 	
 	async getAll(){
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 
 		console.debug('Loading all tutors from database');
 		const [entities, count] = await repository.findAndCount();
@@ -18,7 +19,7 @@ export default class TutorController {
 
 	async getOneById(id: string){
 
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 
 		console.debug('Loading one tutor from database');
 		const entity = await repository.findOneByOrFail({id: id});
@@ -28,7 +29,7 @@ export default class TutorController {
 
 	async create(tutor: Tutor){
 
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 		await repository.save(tutor);
 
 		console.debug(`Saved a new user with id ${tutor.id}`);
@@ -37,7 +38,7 @@ export default class TutorController {
 	}
 
 	async updateAll(tutor: Tutor, id: string){
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 	
 		const exist = await repository.exist({where: {id: id}});
 
@@ -53,7 +54,7 @@ export default class TutorController {
 
 
 	async updateSome(body: object, id: string){
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 		
 		const  tutor = await repository.findOneByOrFail({id: id});
 		
@@ -72,7 +73,7 @@ export default class TutorController {
 
 	async delete(id: string){
 		
-		const repository = AppDataSource.getRepository(Tutor);
+		const repository = dataSource.getRepository(Tutor);
 
 		const tutor = await repository.findOneByOrFail({id: id});
 	

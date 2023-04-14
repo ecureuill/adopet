@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Pet } from './Pets';
-import { Tutor } from './Tutors';
+import { Pet } from './Pet';
+import { Tutor } from './Tutor';
 
 @Entity('FavoriteList')
 export class FavoriteList {

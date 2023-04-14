@@ -1,15 +1,14 @@
 import { Request, Response, Router } from 'express';
-import TutorRouter from './Tutor';
-import ShelterRouter from './Shelter';
-import PetRouter from './Pet';
-import { asyncHandler } from '../ErrorHandler';
+import TutorRouter from './tutor.router';
+import ShelterRouter from './shelter.router';
+import PetRouter from './pet.router';
+import { asyncHandler } from '../middlewares/asyncHandler';
 
 export const router = Router();
 
 const tutorRouter = new TutorRouter();
 const shelterRouter = new ShelterRouter();
 const petRouter = new PetRouter();
-
 
 router.get('/ping', (request: Request, response: Response) => {
 	console.debug(request.body);
@@ -21,7 +20,7 @@ router.get('/ping', (request: Request, response: Response) => {
 
 router.get('/tutores', asyncHandler(tutorRouter.getAll));
 router.get('/tutores/:id', asyncHandler(tutorRouter.getOneById));
-router.post('/tutores', asyncHandler(tutorRouter.create));
+router.post('/tutores',  asyncHandler(tutorRouter.create));
 router.put('/tutores/:id', asyncHandler(tutorRouter.updateAll));
 router.patch('/tutores/:id', asyncHandler(tutorRouter.updateSome));
 router.delete('/tutores/:id', asyncHandler(tutorRouter.delete));

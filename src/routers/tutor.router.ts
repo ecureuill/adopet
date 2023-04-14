@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 
-import PetController from '../../controller/Pet';
-import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../../utils/validations';
+import TutorController from '../controller/tutor.controller';
+import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../utils/validations';
 
-export default class PetRouter {
+export default class TutorRouter {
 	async getAll(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new TutorController();
 		const result = await controller.getAll();
 
 		if(result.count === 0)
@@ -15,7 +15,7 @@ export default class PetRouter {
 	}
 
 	async getOneById(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new TutorController();
 
 		const { id } = request.params;
 
@@ -27,11 +27,11 @@ export default class PetRouter {
 	}
 
 	async create(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new TutorController();
 
 		hasBody(request.body);
 
-		hasRequiredFields(request.body, ['name', 'age']);
+		hasRequiredFields(request.body, ['name', 'password', 'email']);
 
 		const result = await controller.create(request.body);
 
@@ -39,13 +39,13 @@ export default class PetRouter {
 	}
 
 	async updateAll(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new TutorController();
 
 		const { id } = request.params;
 
 		hasValidID(id); 
 		hasBody(request.body);
-		hasRequiredFields(request.body, ['name', 'age']);
+		hasRequiredFields(request.body, ['name', 'password', 'email']);
 		idReplacememtIsNotAllowed(request.body.id, id);
 
 		const result = await controller.updateAll(request.body, id);
@@ -54,14 +54,16 @@ export default class PetRouter {
 	}
 
 	async updateSome(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new TutorController();
 
 		const { id } = request.params;
 
 		hasValidID(id); 
 		hasBody(request.body);
+
 		hasValidValue(request.body, 'name');
-		hasValidValue(request.body, 'age');
+		hasValidValue(request.body, 'password');
+		hasValidValue(request.body, 'email');
 		idReplacememtIsNotAllowed(request.body.id, id);
 
 		const result = await controller.updateSome(request.body, id);
@@ -70,7 +72,7 @@ export default class PetRouter {
 	}
 
 	async delete(request: Request, response: Response) {
-		const controller = new PetController();
+		const controller = new TutorController();
 
 		const { id } = request.params;
 

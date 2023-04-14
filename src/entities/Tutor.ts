@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { Column, Entity } from 'typeorm';
-import { User } from './Users';
+import { User } from './User';
 
 @Entity('Tutor')
 export class Tutor  extends User {

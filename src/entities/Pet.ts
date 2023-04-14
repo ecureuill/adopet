@@ -1,31 +1,7 @@
 /* eslint-disable indent */
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Shelter } from './Shelters';
-
-export enum PetType {
-	DOG = 'dog',
-	CAT = 'cat'
-}
-
-export enum SizeVariety {
-	XXSMALL = 'xxs',
-	XSMALL = 'xs',
-	SMALL = 's',
-	MEDIUM = 'm',
-	LARGE = 'l',
-	XLARGE = 'xl'
-}
-
-export enum AgeUnit {
-	DAYS = 'd',
-	MONTHS = 'm',
-	YEARS = 'y'
-}
-
-export enum Gender {
-	FEMALE = 'f',
-	MALE = 'm'
-}
+import { Shelter } from './Shelter';
+import { AgeUnit, PetType, SizeVariety } from '../types/enums';
 
 @Entity('Pet')
 export class Pet {
