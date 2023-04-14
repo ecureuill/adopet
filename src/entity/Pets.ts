@@ -59,7 +59,7 @@ export class Pet {
 	})
 	type: PetType;
 
-	@Column()
+	@Column({default: false})
 	adopted: boolean;
 
 	@Column({type: 'bytea', nullable: true})
@@ -71,6 +71,13 @@ export class Pet {
 	@UpdateDateColumn()
 	update_date: string;
 
-	@ManyToOne(() => Shelter, (shelter) => shelter.pets)
+	@ManyToOne(() => Shelter, (shelter) => shelter.pets, {
+		onDelete: 'CASCADE',
+		orphanedRowAction: 'delete', 
+		nullable: false
+	})
 	shelter: Shelter;
+
+	@Column({type: 'uuid'})
+	shelterId: string;
 }

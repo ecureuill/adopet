@@ -6,6 +6,8 @@ import { User } from './Users';
 
 @Entity('Shelter')
 export class Shelter extends User {
-	@OneToMany(() => Pet, (pet) => pet.id)
+	@OneToMany(() => Pet, (pet) => pet.shelter, {
+		cascade: ['remove']
+	})
 	pets: Pet[];
 }

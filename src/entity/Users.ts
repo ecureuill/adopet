@@ -22,7 +22,4 @@ export abstract class User {
 
 	@Column({nullable: true})
 	state: string;
-
-	@Column({nullable: true})
-	teste: string;
 }
