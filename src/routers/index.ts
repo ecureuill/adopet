@@ -1,12 +1,15 @@
 import { Request, Response, Router } from 'express';
 import TutorRouter from './Tutor';
 import ShelterRouter from './Shelter';
+import PetRouter from './Pet';
 import { asyncHandler } from '../ErrorHandler';
 
 export const router = Router();
 
 const tutorRouter = new TutorRouter();
 const shelterRouter = new ShelterRouter();
+const petRouter = new PetRouter();
+
 
 router.get('/ping', (request: Request, response: Response) => {
 	console.debug(request.body);
@@ -29,3 +32,11 @@ router.post('/abrigos', asyncHandler(shelterRouter.create));
 router.put('/abrigos/:id', asyncHandler(shelterRouter.updateAll));
 router.patch('/abrigos/:id', asyncHandler(shelterRouter.updateSome));
 router.delete('/abrigos/:id', asyncHandler(shelterRouter.delete));
+
+router.get('/pets', asyncHandler(petRouter.getAll));
+router.get('/pets/:id', asyncHandler(petRouter.getOneById));
+router.post('/pets', asyncHandler(petRouter.create));
+router.put('/pets/:id', asyncHandler(petRouter.updateAll));
+router.patch('/pets/:id', asyncHandler(petRouter.updateSome));
+router.delete('/pets/:id', asyncHandler(petRouter.delete));
+
