@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import ShelterController from '../controller/shelter.controller';
-import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../utils/validations';
 
 export default class ShelterRouter {
 	async getAll(request: Request, response: Response){
@@ -19,8 +18,6 @@ export default class ShelterRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		
 		const result = await controller.getOneById(id);
 
 		return response.status(200).json(result);
@@ -28,10 +25,6 @@ export default class ShelterRouter {
 
 	async create(request: Request, response: Response){
 		const controller = new ShelterController();
-
-		hasBody(request.body);
-
-		hasRequiredFields(request.body, ['name', 'password', 'email']);
 
 		const result = await controller.create(request.body);
 
@@ -43,11 +36,6 @@ export default class ShelterRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		hasBody(request.body);
-		hasRequiredFields(request.body, ['name', 'password', 'email']);
-		idReplacememtIsNotAllowed(request.body.id, id);
-
 		const result = await controller.updateAll(request.body, id);
 
 		return response.status(200).json(result);
@@ -58,14 +46,6 @@ export default class ShelterRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		hasBody(request.body);
-
-		hasValidValue(request.body, 'name');
-		hasValidValue(request.body, 'password');
-		hasValidValue(request.body, 'email');
-		idReplacememtIsNotAllowed(request.body.id, id);
-
 		const result = await controller.updateSome(request.body, id);
 
 		return response.status(200).json(result);
@@ -75,8 +55,6 @@ export default class ShelterRouter {
 		const controller = new ShelterController();
 
 		const { id } = request.params;
-
-		hasValidID(id); 
 
 		const result = await controller.delete(id);
 

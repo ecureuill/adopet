@@ -2,6 +2,7 @@ import { EntityNotFoundError } from 'typeorm';
 import { dataSource } from '../database/datasource/data-source';
 import { Shelter } from '../entities/Shelter';
 import { Variant } from '../utils';
+import { idReplacememtIsNotAllowed } from '../services/validations';
 
 export default class ShelterController {
 	
@@ -39,7 +40,7 @@ export default class ShelterController {
 		const repository = dataSource.getRepository(Shelter);
 		await repository.save(shelter);
 
-		console.debug(`Saved a new user with id ${shelter.id}`);
+		console.debug(`Saved a new shelter with id ${shelter.id}`);
 
 		return shelter;
 	}
@@ -48,13 +49,14 @@ export default class ShelterController {
 		const repository = dataSource.getRepository(Shelter);
 	
 		const exist = await repository.exist({where: {id: id}});
+		idReplacememtIsNotAllowed(shelter.id, id);
 
 		if(!exist)
 			throw new EntityNotFoundError(Shelter, {id: id});
 
 		await repository.save(shelter);
 	
-		console.debug(`update user ${shelter.id}`);
+		console.debug(`update shelter ${shelter.id}`);
 
 		return shelter;
 	}
@@ -68,11 +70,13 @@ export default class ShelterController {
 			(shelter as unknown as Variant)[key] = (body as Variant)[key];
 		}
 
+		idReplacememtIsNotAllowed(shelter.id, id);
+
 		console.debug(shelter);
 		
 		await repository.save(shelter);
 	
-		console.debug(`update user ${shelter.id}`);
+		console.debug(`update shelter ${shelter.id}`);
 
 		return shelter;
 	}
@@ -85,6 +89,6 @@ export default class ShelterController {
 	
 		await repository.remove(shelter);
 		
-		console.debug(`delete user ${shelter.id}`);
+		console.debug(`delete shelter ${shelter.id}`);
 	}
 } 

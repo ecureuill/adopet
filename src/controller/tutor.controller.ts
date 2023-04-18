@@ -1,8 +1,8 @@
-
 import { EntityNotFoundError } from 'typeorm';
 import { dataSource } from '../database/datasource/data-source';
 import { Tutor } from '../entities/Tutor';
 import { Variant } from '../utils';
+import { idReplacememtIsNotAllowed } from '../services/validations';
 
 export default class TutorController {
 	
@@ -42,6 +42,8 @@ export default class TutorController {
 	
 		const exist = await repository.exist({where: {id: id}});
 
+		idReplacememtIsNotAllowed(tutor.id, id);
+
 		if(!exist)
 			throw new EntityNotFoundError(Tutor, {id: id});
 
@@ -61,6 +63,8 @@ export default class TutorController {
 		for (const key of Object.keys(body)) {
 			(tutor as unknown as Variant)[key] = (body as Variant)[key];
 		}
+
+		idReplacememtIsNotAllowed(tutor.id, id);
 
 		console.debug(tutor);
 		

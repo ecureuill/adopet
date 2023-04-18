@@ -2,6 +2,7 @@ import { EntityNotFoundError } from 'typeorm';
 import { dataSource } from '../database/datasource/data-source';
 import { Pet } from '../entities/Pet';
 import { Variant } from '../utils';
+import { idReplacememtIsNotAllowed } from '../services/validations';
 
 export default class PetController {
 	
@@ -31,7 +32,7 @@ export default class PetController {
 		const repository = dataSource.getRepository(Pet);
 		await repository.save(pet);
 
-		console.debug(`Saved a new user with id ${pet.id}`);
+		console.debug(`Saved a new pet with id ${pet.id}`);
 
 		return pet;
 	}
@@ -39,6 +40,8 @@ export default class PetController {
 	async updateAll(pet: Pet, id: string){
 		const repository = dataSource.getRepository(Pet);
 	
+		idReplacememtIsNotAllowed(pet.id, id);
+
 		const exist = await repository.exist({where: {id: id}});
 
 		if(!exist)
@@ -46,11 +49,10 @@ export default class PetController {
 
 		await repository.save(pet);
 	
-		console.debug(`update user ${pet.id}`);
+		console.debug(`update pet ${pet.id}`);
 
 		return pet;
 	}
-
 
 	async updateSome(body: object, id: string){
 		const repository = dataSource.getRepository(Pet);
@@ -61,11 +63,13 @@ export default class PetController {
 			(pet as unknown as Variant)[key] = (body as Variant)[key];
 		}
 
+		idReplacememtIsNotAllowed(pet.id, id);
+
 		console.debug(pet);
 		
 		await repository.save(pet);
 	
-		console.debug(`update user ${pet.id}`);
+		console.debug(`update pet ${pet.id}`);
 
 		return pet;
 	}
@@ -78,6 +82,6 @@ export default class PetController {
 	
 		await repository.remove(pet);
 		
-		console.debug(`delete user ${pet.id}`);
+		console.debug(`delete pet ${pet.id}`);
 	}
 } 

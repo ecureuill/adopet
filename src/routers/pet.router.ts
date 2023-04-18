@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import PetController from '../controller/pet.controller';
-import { hasValidID, hasBody, hasRequiredFields, hasValidValue, idReplacememtIsNotAllowed } from '../utils/validations';
 
 export default class PetRouter {
 	async getAll(request: Request, response: Response){
@@ -19,8 +18,6 @@ export default class PetRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		
 		const result = await controller.getOneById(id);
 
 		return response.status(200).json(result);
@@ -28,10 +25,6 @@ export default class PetRouter {
 
 	async create(request: Request, response: Response){
 		const controller = new PetController();
-
-		hasBody(request.body);
-
-		hasRequiredFields(request.body, ['name', 'age']);
 
 		const result = await controller.create(request.body);
 
@@ -43,11 +36,6 @@ export default class PetRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		hasBody(request.body);
-		hasRequiredFields(request.body, ['name', 'age']);
-		idReplacememtIsNotAllowed(request.body.id, id);
-
 		const result = await controller.updateAll(request.body, id);
 
 		return response.status(200).json(result);
@@ -58,12 +46,6 @@ export default class PetRouter {
 
 		const { id } = request.params;
 
-		hasValidID(id); 
-		hasBody(request.body);
-		hasValidValue(request.body, 'name');
-		hasValidValue(request.body, 'age');
-		idReplacememtIsNotAllowed(request.body.id, id);
-
 		const result = await controller.updateSome(request.body, id);
 
 		return response.status(200).json(result);
@@ -73,8 +55,6 @@ export default class PetRouter {
 		const controller = new PetController();
 
 		const { id } = request.params;
-
-		hasValidID(id); 
 
 		const result = await controller.delete(id);
 
