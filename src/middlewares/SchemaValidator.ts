@@ -5,15 +5,24 @@ import { Variant } from '../utils';
 import { JSONSchemaValidatorError } from '../utils/JSONSchemaValidatorError';
 import addFormats from 'ajv-formats';
 
+type SchemaValidatorProperties = {
+	schema: string,
+	data: 'body' | 'params' | 'query',
+	strictRequiredChecks?: boolean,
+}	
+
 export default class SchemaValidator {
 	ajv: Ajv; 
 
 	constructor(schemas: AnySchema[]){
-		this.ajv = new Ajv({schemas: schemas});
+		this.ajv = new Ajv({schemas: schemas, allErrors: true});
 		addFormats(this.ajv);
 	}
 
-	validate = (schema: string, data: 'body' | 'params' | 'query') => {
+	validate = ({schema, data, strictRequiredChecks}: SchemaValidatorProperties) => {
+
+		if(strictRequiredChecks === undefined)
+			strictRequiredChecks = true;
 
 		const validateAjv = this.ajv.getSchema(schema);
 
@@ -24,10 +33,21 @@ export default class SchemaValidator {
 		return (request: Request, response: Response, next: NextFunction) => {
 			const validation = validateAjv((request as unknown as Variant)[data]);
 
-console.debug((request as unknown as Variant)[data]);
+			if(!validation){
 
-			if(!validation)
-				throw new JSONSchemaValidatorError(validateAjv.errors as ErrorObject[], data);
+				let errors = validateAjv.errors as ErrorObject[];
+
+				if(!strictRequiredChecks)
+				{
+					errors = errors.filter(err => err.keyword !== 'required');
+
+					if(errors.length === 0) 
+						return next();
+				}
+
+				throw new JSONSchemaValidatorError(errors, data);
+			}
+			
 			return next();
 		};
 	};
