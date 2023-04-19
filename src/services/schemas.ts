@@ -1,5 +1,5 @@
 import {JSONSchemaType} from 'ajv';
-import { IPet, ITutor, IShelter } from '../types/json-schema-interfaces';
+import { IPet, ITutor, IShelter, IUser } from '../types/json-schema-interfaces';
 import { phoneRegex } from './validations';
 
 const definitionsSchema = {
@@ -55,9 +55,10 @@ export const paramSchema = {
 	}
 };
 
-export const tutorSchema: JSONSchemaType<ITutor> = {
-	$id: 'tutorSchema',
+const userSchema: JSONSchemaType<IUser> = {
+	$id: 'userSchema',
 	type: 'object',
+	required: ['email', 'password', 'name'],
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
 		email: {$ref: 'definitionsSchema#/definitions/email'},
@@ -66,10 +67,25 @@ export const tutorSchema: JSONSchemaType<ITutor> = {
 		phone: {$ref: 'definitionsSchema#/definitions/phone'},
 		city: {$ref: 'definitionsSchema#/definitions/non-empty-string'},
 		state: {$ref: 'definitionsSchema#/definitions/state'},
+	},
+};
+
+export const tutorSchema: JSONSchemaType<ITutor> = {
+	$id: 'tutorSchema',
+	type: 'object',
+	required: ['user'],
+	properties: {
+		id: { $ref: 'definitionsSchema#/definitions/uuid'},
 		about: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		user: {
+			type: 'object',
+			items: userSchema,
+			$id: 'tutor-userSchema',
+			required: []
+		}
+
 	},
-	required: ['email', 'password', 'name'],
 	additionalProperties: false,
 	minProperties: 1,
 };
@@ -121,23 +137,23 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 	additionalProperties: false,
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
-		email: {$ref: 'definitionsSchema#/definitions/email'},
-		password: {$ref: 'definitionsSchema#/definitions/password'},
-		name: { $ref: 'definitionsSchema#/definitions/non-empty-string'},
-		phone: {$ref: 'definitionsSchema#/definitions/phone'},
-		city: {$ref: 'definitionsSchema#/definitions/non-empty-string'},
-		state: {$ref: 'definitionsSchema#/definitions/state'},
 		pets: {
 			type: 'array',
 			items: petSchema,
 			$id: 'shelter-petSchema',
 			uniqueItems: true,
+		},
+		user: {
+			type: 'object',
+			items: userSchema,
+			$id: 'shelter-userSchema',
+			required: []
 		}
 	},
-	required: ['email', 'password', 'name'],
+	required: ['user'],
 	minProperties: 1 //avoid empty body on
 };
 
-const schemas = [definitionsSchema, petSchema, tutorSchema, shelterSchema, paramSchema];
+const schemas = [definitionsSchema, userSchema, petSchema, tutorSchema, shelterSchema, paramSchema];
 
 export default schemas;

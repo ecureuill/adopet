@@ -1,7 +1,8 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
-
 /* eslint-disable indent */
-export abstract class User {
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('User')
+export class User {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 

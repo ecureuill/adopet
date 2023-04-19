@@ -16,15 +16,19 @@ export interface IPet {
 	size_variety: 'xxs'| 'xs'| 's'| 'm'| 'l'| 'xl';
 	type: 'dog' | 'cat';
 	adopted: boolean;
-	photo?: string;
+	photo?: string | Buffer;
 	shelterId: string;
 }
 
-export interface ITutor extends IUser {
-	photo?: string,
-	about?: string
+export interface ITutor {
+	id: string;
+	photo?: string | Buffer,
+	about?: string,
+	user: IUser
 }
 
-export interface IShelter extends IUser {
-	pets: Array<IPet>
+export interface IShelter {
+	id: string;
+	pets: Array<IPet>,
+	user: IUser
 }

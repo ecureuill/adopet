@@ -1,13 +1,21 @@
 /* eslint-disable indent */
 
-import { Entity, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Pet } from './Pet';
 import { User } from './User';
+import { IShelter } from '../types/json-schema-interfaces';
 
 @Entity('Shelter')
-export class Shelter extends User {
+export class Shelter implements IShelter{
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
+
 	@OneToMany(() => Pet, (pet) => pet.shelter, {
 		cascade: ['remove']
 	})
 	pets: Pet[];
+
+	@OneToOne(() => User)
+	@JoinColumn()
+	user: User;
 }

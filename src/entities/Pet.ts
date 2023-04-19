@@ -2,9 +2,10 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Shelter } from './Shelter';
 import { AgeUnit, PetType, SizeVariety } from '../types/enums';
+import { IPet } from '../types/json-schema-interfaces';
 
 @Entity('Pet')
-export class Pet {
+export class Pet implements IPet{
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
