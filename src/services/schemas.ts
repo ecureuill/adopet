@@ -1,5 +1,5 @@
 import {JSONSchemaType} from 'ajv';
-import { IPet, ITutor, IShelter, IUser } from '../types/json-schema-interfaces';
+import { IPet, ITutor, IShelter, IUser } from '../types/schemas';
 import { phoneRegex } from './validations';
 
 const definitionsSchema = {

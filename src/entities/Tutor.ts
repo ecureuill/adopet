@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
-import { ITutor } from '../types/json-schema-interfaces';
+import { ITutor } from '../types/schemas';
 
 @Entity('Tutor')
 export class Tutor implements ITutor {

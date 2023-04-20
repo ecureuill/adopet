@@ -3,7 +3,7 @@
 import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Pet } from './Pet';
 import { User } from './User';
-import { IShelter } from '../types/json-schema-interfaces';
+import { IShelter } from '../types/schemas';
 
 @Entity('Shelter')
 export class Shelter implements IShelter{

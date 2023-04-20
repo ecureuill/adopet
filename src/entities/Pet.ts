@@ -2,7 +2,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Shelter } from './Shelter';
 import { AgeUnit, PetType, SizeVariety } from '../types/enums';
-import { IPet } from '../types/json-schema-interfaces';
+import { IPet } from '../types/schemas';
 
 @Entity('Pet')
 export class Pet implements IPet{

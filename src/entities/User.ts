@@ -1,8 +1,9 @@
 /* eslint-disable indent */
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IUser } from '../types/schemas';
 
 @Entity('User')
-export class User {
+export class User implements IUser {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
