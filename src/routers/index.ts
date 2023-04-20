@@ -27,7 +27,7 @@ router.get('/ping', (request: Request, response: Response) => {
 	});
 });
 
-router.all('(/users)|(/tutores)',
+router.all('/:endpoint(users|tutores)',
 	JWTVerify,
 	validateAuthorization([Role.ADMIN])
 );
@@ -45,12 +45,17 @@ router.delete('*',
 	validateAuthorization([Role.ADMIN])
 );
 
-router.all('//:id', 
+router.all('/:endpoint/:id', 
 	validator.validate({schema: 'paramSchema', data: 'params'})
 );
 
 router.post('/login',
 	asyncHandler(userRouter.auth)
+);
+
+router.post('/signup',
+	validator.validate({schema: 'userSchema', data: 'body'}),
+	asyncHandler(userRouter.create)
 );
 
 
@@ -60,17 +65,11 @@ router.get('/users',
 router.get('/users/:id', 
 	asyncHandler(userRouter.getOneById)
 );
-router.post('/users',
-	validator.validate({schema: 'userSchema', data: 'body'}),
-	asyncHandler(userRouter.create)
-);
 router.put('/users/:id',
-	JWTVerify,
 	validator.validate({schema: 'userSchema', data: 'body'}),
 	asyncHandler(userRouter.updateAll)
 );
 router.patch('/users/:id',
-	JWTVerify,
 	validator.validate({schema: 'userSchema', data: 'body', strictRequiredChecks: false}),
 	asyncHandler(userRouter.updateAll)
 );
