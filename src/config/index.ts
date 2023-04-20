@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv-safe';
+import { Secret, SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { DataSourceOptions } from 'typeorm';
 
 dotenv.config({
@@ -18,4 +19,15 @@ export const dataSouceOptions: DataSourceOptions = {
 	entities: ['./src/entities/*.ts'],
 	migrations: ['./src/database/migration/*.ts'],
 	subscribers: [],
+};
+
+export const jwtSecret: Secret = process.env.SECRET || '';
+
+export const jwtSignOptions: SignOptions = {
+	algorithm: 'HS256',
+	expiresIn: '1h',
+};
+
+export const jwtVerifyOptions: VerifyOptions = {
+	algorithms: ['HS256'],
 };
