@@ -7,10 +7,10 @@
     "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:run": "typeorm-ts-node-commonjs migration:run --dataSource ./src/datasource/data-source.ts",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/datasource/data-source.ts ./src/migration/update",
-    "migration:create": "typeorm-ts-node-commonjs migration:create ./src/migration/update",
-    "schema:drop": "typeorm-ts-node-commonjs schema:drop -d ./src/datasource/data-source.ts"
+    "migration:run": "typeorm-ts-node-commonjs migration:run --dataSource ./src/database/datasource/data-source.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/database/datasource/data-source.ts ./src/database/migration/update",
+    "migration:create": "typeorm-ts-node-commonjs migration:create ./src/database/migration/update",
+    "schema:drop": "typeorm-ts-node-commonjs schema:drop -d ./src/database/datasource/data-source.ts"
   },
   "repository": {
     "type": "git",
