@@ -3,6 +3,7 @@ import { dataSource } from '../database/datasource/data-source';
 import { Tutor } from '../entities/Tutor';
 import { Variant } from '../utils';
 import { idReplacememtIsNotAllowed } from '../services/validations';
+import { passwordToHash } from '../services/passwords';
 
 export default class TutorController {
 	
@@ -28,6 +29,8 @@ export default class TutorController {
 	}
 
 	async create(tutor: Tutor){
+
+		tutor.user.password = passwordToHash(tutor.user.password);
 
 		const repository = dataSource.getRepository(Tutor);
 		await repository.save(tutor);
