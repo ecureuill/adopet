@@ -4,6 +4,7 @@ import { Shelter } from '../entities/Shelter';
 import { Variant } from '../utils';
 import { idReplacememtIsNotAllowed } from '../services/validations';
 import { passwordToHash } from '../services/passwords';
+import { Role } from '../types/enums';
 
 export default class ShelterController {
 	
@@ -39,6 +40,7 @@ export default class ShelterController {
 	async create(shelter: Shelter){
 
 		shelter.user.password = passwordToHash(shelter.user.password);
+		shelter.user.role = Role.SHELTER;
 		
 		const repository = dataSource.getRepository(Shelter);
 		await repository.save(shelter);

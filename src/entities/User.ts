@@ -11,7 +11,6 @@ export class User implements IUser {
 	@Column({
 		type: 'enum',
 		enum: Role,
-		default: Role.USER
 	})
 	role: Role;
 
