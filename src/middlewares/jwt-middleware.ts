@@ -9,8 +9,9 @@ export const JWTVerify = (request: Request, response: Response, next: NextFuncti
 	if (token === undefined)
 		throw createError.Unauthorized('No token provided.');
 	
-	const { id } = verifyJwtToken(token);
+	const { id, role } = verifyJwtToken(token);
 	response.locals.id = id;
+	response.locals.role = role;
 
 	next();
 };
