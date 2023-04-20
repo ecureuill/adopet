@@ -22,3 +22,8 @@ export enum Gender {
 	FEMALE = 'f',
 	MALE = 'm'
 }
+
+export enum Role {
+	ADMIN = 'admin',
+	USER = 'user',
+}

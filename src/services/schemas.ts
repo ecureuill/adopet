@@ -61,6 +61,7 @@ const userSchema: JSONSchemaType<IUser> = {
 	required: ['email', 'password', 'name'],
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
+		role: { $ref: 'definitionsSchema#/definitions/non-empty-string'},
 		email: {$ref: 'definitionsSchema#/definitions/email'},
 		password: {$ref: 'definitionsSchema#/definitions/password'},
 		name: { $ref: 'definitionsSchema#/definitions/non-empty-string'},
