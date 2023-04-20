@@ -1,7 +1,10 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv-safe';
 import { DataSourceOptions } from 'typeorm';
 
-dotenv.config();
+dotenv.config({
+	example: '.env.template',
+	allowEmptyValues: false,
+});
 
 export const dataSouceOptions: DataSourceOptions = {	
 	type: 'postgres',
