@@ -15,7 +15,7 @@ export class Shelter implements IShelter{
 	})
 	pets: Pet[];
 
-	@OneToOne(() => User)
+	@OneToOne(() => User, { cascade: true})
 	@JoinColumn()
 	user: User;
 }
