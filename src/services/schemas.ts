@@ -69,6 +69,8 @@ const userSchema: JSONSchemaType<IUser> = {
 		city: {$ref: 'definitionsSchema#/definitions/non-empty-string'},
 		state: {$ref: 'definitionsSchema#/definitions/state'},
 	},
+	additionalProperties: false,
+	minProperties: 1,
 };
 
 export const tutorSchema: JSONSchemaType<ITutor> = {
@@ -83,7 +85,9 @@ export const tutorSchema: JSONSchemaType<ITutor> = {
 			type: 'object',
 			items: userSchema,
 			$id: 'tutor-userSchema',
-			required: []
+			required: ['email', 'password', 'name'],
+			additionalProperties: false,
+			minProperties: 1,
 		}
 
 	},
@@ -148,7 +152,9 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 			type: 'object',
 			items: userSchema,
 			$id: 'shelter-userSchema',
-			required: []
+			required: ['email', 'password', 'name'],
+			additionalProperties: false,
+			minProperties: 1,
 		}
 	},
 	required: ['user'],
