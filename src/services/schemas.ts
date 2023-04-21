@@ -49,7 +49,7 @@ export const paramSchema = {
 	$id: 'paramSchema',
 	type: 'object',
 	required: ['id'],
-	additionalProperties: false,
+	// additionalProperties: false,
 	properties: {
 		id: {$ref: 'definitionsSchema#/definitions/uuid'},
 	}
@@ -81,14 +81,7 @@ export const tutorSchema: JSONSchemaType<ITutor> = {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
 		about: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
-		user: {
-			type: 'object',
-			items: userSchema,
-			$id: 'tutor-userSchema',
-			required: ['email', 'password', 'name'],
-			additionalProperties: false,
-			minProperties: 1,
-		}
+		user: userSchema
 
 	},
 	additionalProperties: false,
@@ -148,14 +141,7 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 			$id: 'shelter-petSchema',
 			uniqueItems: true,
 		},
-		user: {
-			type: 'object',
-			items: userSchema,
-			$id: 'shelter-userSchema',
-			required: ['email', 'password', 'name'],
-			additionalProperties: false,
-			minProperties: 1,
-		}
+		user: userSchema
 	},
 	required: ['user'],
 	minProperties: 1 //avoid empty body on
