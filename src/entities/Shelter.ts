@@ -1,13 +1,17 @@
 /* eslint-disable indent */
 
-import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { Pet } from './Pet';
 import { User } from './User';
 import { IShelter } from '../types/schemas';
 
 @Entity('Shelter')
 export class Shelter implements IShelter{
-	@PrimaryGeneratedColumn('uuid')
+	@Column('uuid', {
+		generated: 'uuid',
+		primary: true,
+		select: false
+	})
 	id: string;
 
 	@OneToMany(() => Pet, (pet) => pet.shelter, {

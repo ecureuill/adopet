@@ -1,11 +1,15 @@
 /* eslint-disable indent */
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { User } from './User';
 import { ITutor } from '../types/schemas';
 
 @Entity('Tutor')
 export class Tutor implements ITutor {
-	@PrimaryGeneratedColumn('uuid')
+	@Column('uuid', {
+		generated: 'uuid',
+		primary: true,
+		select: false
+	})
 	id: string;
 
 	@Column({type: 'bytea', nullable: true})
