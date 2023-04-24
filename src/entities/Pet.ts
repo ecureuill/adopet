@@ -1,16 +1,12 @@
 /* eslint-disable indent */
-import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Shelter } from './Shelter';
 import { AgeUnit, PetType, SizeVariety } from '../types/enums';
 import { IPet } from '../types/schemas';
 
 @Entity('Pet')
 export class Pet implements IPet{
-	@Column('uuid', {
-		generated: 'uuid',
-		primary: true,
-		select: false
-	})
+	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
 	@Column()

@@ -1,28 +1,23 @@
 /* eslint-disable indent */
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/enums';
 import { IUser } from '../types/schemas';
 
 @Entity('User')
 export class User implements IUser {
-	@Column('uuid', {
-		generated: 'uuid',
-		primary: true,
-		select: false
-	})
+	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
 	@Column({
 		type: 'enum',
 		enum: Role,
-		select: false
 	})
 	role: Role;
 
 	@Column({unique: true})
 	email: string;
 
-	@Column({select: false})
+	@Column()
 	password: string;
 
 	@Column()

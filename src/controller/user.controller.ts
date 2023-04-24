@@ -15,12 +15,9 @@ export default class UserController {
 		const repository = dataSource.getRepository(User);
 
 		console.debug('Loading one user from database');
-		const entity = await repository.createQueryBuilder('user')
-			.addSelect(['user.password', 'user.role'])
-			.where({
-				email: email,
-			})
-			.getOneOrFail();
+		const entity = await repository.findOneByOrFail({
+			email: email,
+		});
 
 		if(!passwordCompareHash(password, entity.password))
 			throw new createError.Unauthorized('Invalid credentials');
