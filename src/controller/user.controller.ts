@@ -4,18 +4,27 @@ import { passwordCompareHash, passwordToHash } from '../services/passwords';
 import createError from 'http-errors';
 import { createJwtToken } from '../services/tokens';
 import { Role } from '../types/enums';
-import { idReplacememtIsNotAllowed } from '../services/validations';
-import { EntityNotFoundError } from 'typeorm';
-import { Variant } from '../utils';
+import { IUserSettings } from '../types/interfaces';
+import Controller from '.';
 
-export default class UserController {
-	
+export default class UserController extends Controller<User> {
+	private static alias = 'user';
+
+	constructor(userSettings: IUserSettings){
+		super(
+			{
+				userSettings: userSettings, 
+				idColumnName: 'id',
+				ownerColumnName: 'id',
+				alias: UserController.alias
+			}, 
+			User,
+		);
+	}
+
 	async auth(email: string, password: string){
 
-		const repository = dataSource.getRepository(User);
-
-		console.debug('Loading one user from database');
-		const entity = await repository.findOneByOrFail({
+		const entity = await User.findOneByOrFail({
 			email: email,
 		});
 
@@ -40,72 +49,22 @@ export default class UserController {
 		return user;
 	}
 
-	async getAll(){
-		const repository = dataSource.getRepository(User);
+	async updateAll(entity: User, id: string) {
+		entity.password = passwordToHash(entity.password);
 
-		console.debug('Loading all users from database');
-		const [entities, count] = await repository.findAndCount();
-		console.debug(entities);
-		console.debug(`count ${count}`);
-
-		return { entities, count };
+		return super.updateAll(entity, id);
 	}
 
-	async getOneById(id: string){
+	async updateSome(body: object, id: string): Promise<User> {
+		const key = 'password' as keyof object;
 
-		const repository = dataSource.getRepository(User);
+		if(body[key] !== undefined)
+			(body as User).password = passwordToHash(body[key]);
 
-		console.debug('Loading one user from database');
-		const entity = await repository.findOneByOrFail({id: id});
-
-		return entity;
+		return super.updateSome(body, id);
 	}
 
-	async updateAll(user: User, id: string){
-		const repository = dataSource.getRepository(User);
-	
-		const exist = await repository.exist({where: {id: id}});
-
-		idReplacememtIsNotAllowed(user.id, id);
-
-		if(!exist)
-			throw new EntityNotFoundError(User, {id: id});
-
-		await repository.save(user);
-	
-		console.debug(`update user ${user.id}`);
-
-		return user;
-	}
-
-	async updateSome(body: object, id: string){
-		const repository = dataSource.getRepository(User);
-		
-		const  user = await repository.findOneByOrFail({id: id});
-		
-		for (const key of Object.keys(body)) {
-			(user as unknown as Variant)[key] = (body as Variant)[key];
-		}
-
-		idReplacememtIsNotAllowed(user.id, id);
-
-		console.debug(user);
-		
-		await repository.save(user);
-	
-		console.debug(`update user ${user.id}`);
-
-		return user;
-	}
-
-	async delete(id: string){
-		
-		const repository = dataSource.getRepository(User);
-
-		const user = await repository.findOneByOrFail({id: id});
-	
-		await repository.remove(user);
-		
-		console.debug(`delete user ${user.id}`);
+	async delete(id: string) {
+		return super.delete(id, true);
 	}
 }

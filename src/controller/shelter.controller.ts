@@ -1,40 +1,35 @@
-import { EntityNotFoundError } from 'typeorm';
+import Controller from '.';
 import { dataSource } from '../database/datasource/data-source';
 import { Shelter } from '../entities/Shelter';
-import { Variant } from '../utils';
-import { idReplacememtIsNotAllowed } from '../services/validations';
 import { passwordToHash } from '../services/passwords';
+import { idReplacememtIsNotAllowed } from '../services/validations';
 import { Role } from '../types/enums';
+import { IUserSettings } from '../types/interfaces';
 
-export default class ShelterController {
-	
-	async getAll(){
-		const repository = dataSource.getRepository(Shelter);
+export default class ShelterController extends Controller<Shelter>{
 
-		console.debug('Loading all shelters from database');
-		const [entities, count] = await repository
-			.createQueryBuilder('shelter')
-			.leftJoinAndSelect('shelter.pets', 'pets', 'pets.adopted = :isAdopted', {isAdopted: false})
-			.getManyAndCount();
+	private static alias = 'shelter';
 
-		console.debug(entities);
-		console.debug(`count ${count}`);
-
-		return { entities, count };
-	}
-
-	async getOneById(id: string){
-
-		const repository = dataSource.getRepository(Shelter);
-
-		console.debug('Loading one shelter from database');
-		const entity = await repository
-			.createQueryBuilder('shelter')
-			.leftJoinAndSelect('shelter.pets', 'pets', 'pets.adopted = :isAdopted', {isAdopted: false})
-			.where({ id: id})
-			.getOneOrFail();
-
-		return entity;
+	constructor(userSettings: IUserSettings){
+		super(
+			{
+				userSettings: userSettings, 
+				idColumnName: 'id',
+				ownerColumnName: 'userId',
+				alias: ShelterController.alias
+			}, 
+			Shelter, 
+			[	
+				{
+					property: `${ShelterController.alias}.pets`,
+					alias: 'pets', 
+				}, 
+				{
+					property: `${ShelterController.alias}.user`,
+					alias: 'user',
+				}
+			]
+		);
 	}
 
 	async create(shelter: Shelter){
@@ -50,50 +45,39 @@ export default class ShelterController {
 		return shelter;
 	}
 
-	async updateAll(shelter: Shelter, id: string){
-		const repository = dataSource.getRepository(Shelter);
-	
-		const exist = await repository.exist({where: {id: id}});
-		idReplacememtIsNotAllowed(shelter.id, id);
+	async updateAll(entity: Shelter, id: string) {
+		
+		const shelter = await Shelter.findOneByOrFail({id : id});
 
-		if(!exist)
-			throw new EntityNotFoundError(Shelter, {id: id});
+		if(entity.id === undefined || entity.id === '') 
+			entity.id = id;
+		
+		if(entity.userId === undefined || entity.id === '')
+			entity.userId = shelter.userId;
 
-		await repository.save(shelter);
-	
-		console.debug(`update shelter ${shelter.id}`);
+		if(entity.user !== undefined)
+			entity.user.id = shelter.userId;
 
-		return shelter;
+		if(entity.user?.password !== undefined)
+			entity.user.password = passwordToHash(entity.user.password);
+
+		idReplacememtIsNotAllowed(entity.userId, shelter.userId);
+		idReplacememtIsNotAllowed(entity.user.id, shelter.userId);
+
+		return super.updateAll(entity, id);
 	}
 
-	async updateSome(body: object, id: string){
-		const repository = dataSource.getRepository(Shelter);
+	async updateSome(body: object, id: string) {
 		
-		const  shelter = await repository.findOneByOrFail({id: id});
-		
-		for (const key of Object.keys(body)) {
-			(shelter as unknown as Variant)[key] = (body as Variant)[key];
-		}
+		if((body as Shelter).user?.password !== undefined)
+			(body as Shelter).user.password = passwordToHash((body as Shelter).user.password);
 
-		idReplacememtIsNotAllowed(shelter.id, id);
-
-		console.debug(shelter);
-		
-		await repository.save(shelter);
-	
-		console.debug(`update shelter ${shelter.id}`);
-
-		return shelter;
+		return super.updateSome(body, id);
 	}
 
-	async delete(id: string){
-		
-		const repository = dataSource.getRepository(Shelter);
+	async delete(id: string) {
 
-		const shelter = await repository.findOneByOrFail({id: id});
-	
-		await repository.remove(shelter);
-		
-		console.debug(`delete shelter ${shelter.id}`);
+		return super.delete(id, true);
 	}
 } 
+

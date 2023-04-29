@@ -4,7 +4,7 @@ import PetController from '../controller/pet.controller';
 
 export default class PetRouter {
 	async getAll(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 		const result = await controller.getAll();
 
 		if(result.count === 0)
@@ -14,7 +14,7 @@ export default class PetRouter {
 	}
 
 	async getOneById(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -24,7 +24,7 @@ export default class PetRouter {
 	}
 
 	async create(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 
 		const result = await controller.create(request.body);
 
@@ -32,7 +32,7 @@ export default class PetRouter {
 	}
 
 	async updateAll(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -42,7 +42,7 @@ export default class PetRouter {
 	}
 
 	async updateSome(request: Request, response: Response){
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -52,7 +52,7 @@ export default class PetRouter {
 	}
 
 	async delete(request: Request, response: Response) {
-		const controller = new PetController();
+		const controller = new PetController(response.locals.user);
 
 		const { id } = request.params;
 

@@ -4,7 +4,7 @@ import ShelterController from '../controller/shelter.controller';
 
 export default class ShelterRouter {
 	async getAll(request: Request, response: Response){
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 		const result = await controller.getAll();
 
 		if(result.count === 0)
@@ -14,8 +14,9 @@ export default class ShelterRouter {
 	}
 
 	async getOneById(request: Request, response: Response){
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 
+		console.debug(request.params);
 		const { id } = request.params;
 
 		const result = await controller.getOneById(id);
@@ -24,7 +25,7 @@ export default class ShelterRouter {
 	}
 
 	async create(request: Request, response: Response){
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 
 		const result = await controller.create(request.body);
 
@@ -32,7 +33,7 @@ export default class ShelterRouter {
 	}
 
 	async updateAll(request: Request, response: Response){
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -42,7 +43,7 @@ export default class ShelterRouter {
 	}
 
 	async updateSome(request: Request, response: Response){
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -52,7 +53,7 @@ export default class ShelterRouter {
 	}
 
 	async delete(request: Request, response: Response) {
-		const controller = new ShelterController();
+		const controller = new ShelterController(response.locals.user);
 
 		const { id } = request.params;
 

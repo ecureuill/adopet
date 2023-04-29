@@ -7,8 +7,8 @@ import SchemaValidator from '../middlewares/SchemaValidator';
 import schemas from '../services/schemas';
 import UserRouter from './user.router';
 import { JWTVerify } from '../middlewares/jwt-middleware';
-import { validateAuthorization } from '../middlewares/authorization-middleware';
-import { Role } from '../types/enums';
+import { validatePermissions } from '../middlewares/authorization-middleware';
+import { Resources, Actions } from '../utils/consts';
 
 export const router = Router();
 
@@ -19,35 +19,18 @@ const userRouter = new UserRouter();
 
 const validator = new SchemaValidator(schemas);
 
-router.get('/ping', (request: Request, response: Response) => {
-	console.debug(request.body);
-	console.debug(request.params);
+//TO-DO: fix captured params
+const uuidRegex = '(([A-z0-9]+-){4}[A-z0-9]+)';
+
+
+router.get('/ping/', (request: Request, response: Response) => {
 	return response.json({
-		mensagem: 'pong'
+		pong: {
+			params: request.params,
+			body: request.body
+		}
 	});
 });
-
-router.all('/:endpoint(users|tutores)',
-	JWTVerify,
-	validateAuthorization([Role.ADMIN])
-);
-
-router.put('*',
-	JWTVerify,
-);
-
-router.patch('*',
-	JWTVerify,
-);
-
-router.delete('*',
-	JWTVerify,
-	validateAuthorization([Role.ADMIN])
-);
-
-router.all('/:endpoint/:id', 
-	validator.validate({schema: 'paramSchema', data: 'params'})
-);
 
 router.post('/login',
 	asyncHandler(userRouter.auth)
@@ -58,88 +41,114 @@ router.post('/signup',
 	asyncHandler(userRouter.create)
 );
 
+router.post('/signup/tutores/',
+	validator.validate({schema: 'tutorSchema', data: 'body'}),
+	asyncHandler(tutorRouter.create)
+);
+
+router.post('/signup/abrigos/',
+	validator.validate({schema: 'shelterSchema', data: 'body'}),
+	asyncHandler(shelterRouter.create)
+);
+
+router.all('*',
+	JWTVerify,
+);
 
 router.get('/users',
+	validatePermissions(Resources.USER, Actions.READ), 
 	asyncHandler(userRouter.getAll)
 );
-router.get('/users/:id', 
+router.get(`/users/:id(${uuidRegex})`, 
+	validatePermissions(Resources.USER, Actions.READ), 
 	asyncHandler(userRouter.getOneById)
 );
-router.put('/users/:id',
-	validator.validate({schema: 'userSchema', data: 'body'}),
-	asyncHandler(userRouter.updateAll)
-);
-router.patch('/users/:id',
+router.put(`/users/:id(${uuidRegex})`,
+	validatePermissions(Resources.USER, Actions.UPDATE), 
 	validator.validate({schema: 'userSchema', data: 'body', strictRequiredChecks: false}),
 	asyncHandler(userRouter.updateAll)
 );
-router.delete('/users/:id', 
+router.patch(`/users/:id(${uuidRegex})`,
+	validatePermissions(Resources.USER, Actions.UPDATE), 
+	validator.validate({schema: 'userSchema', data: 'body', strictRequiredChecks: false}),
+	asyncHandler(userRouter.updateSome)
+);
+router.delete(`/users/:id(${uuidRegex})`, 
+	validatePermissions(Resources.USER, Actions.DELETE), 
 	asyncHandler(userRouter.delete)
 );
 
 router.get('/tutores', 
+	validatePermissions(Resources.TUTOR, Actions.READ), 
 	asyncHandler(tutorRouter.getAll)
 );
-router.get('/tutores/:id', 
+router.get(`/tutores/:id(${uuidRegex})`, 
+	validatePermissions(Resources.TUTOR, Actions.READ), 
 	asyncHandler(tutorRouter.getOneById)
 );
-router.post('/tutores', 
-	validator.validate({schema: 'tutorSchema', data: 'body'}),
-	asyncHandler(tutorRouter.create)
-);
-router.put('/tutores/:id', 
+router.put(`/tutores/:id(${uuidRegex})`, 
+	validatePermissions(Resources.TUTOR, Actions.UPDATE), 
 	validator.validate({schema: 'tutorSchema', data: 'body'}),
 	asyncHandler(tutorRouter.updateAll)
 );
-router.patch('/tutores/:id', 
+router.patch(`/tutores/:id(${uuidRegex})`, 
+	validatePermissions(Resources.TUTOR, Actions.UPDATE), 
 	validator.validate({schema: 'tutorSchema', data: 'body', strictRequiredChecks: false}),
 	asyncHandler(tutorRouter.updateSome)
 );
-router.delete('/tutores/:id', 
+router.delete(`/tutores/:id(${uuidRegex})`, 
+	validatePermissions(Resources.TUTOR, Actions.DELETE), 
 	asyncHandler(tutorRouter.delete)
 );
 
 router.get('/abrigos', 
+	validatePermissions(Resources.SHELTER, Actions.READ), 
 	asyncHandler(shelterRouter.getAll)
 );
-router.get('/abrigos/:id', 
+router.get(`/abrigos/:id(${uuidRegex})`, 
+	validatePermissions(Resources.SHELTER, Actions.READ), 
 	asyncHandler(shelterRouter.getOneById)
 );
-router.post('/abrigos', 
-	validator.validate({schema: 'shelterSchema', data: 'body'}),
-	asyncHandler(shelterRouter.create)
-);
-router.put('/abrigos/:id', 
+router.put(`/abrigos/:id(${uuidRegex})`, 
+	validatePermissions(Resources.SHELTER, Actions.UPDATE), 
 	validator.validate({schema: 'shelterSchema', data: 'body'}),
 	asyncHandler(shelterRouter.updateAll)
 );
-router.patch('/abrigos/:id', 
+router.patch(`/abrigos/:id(${uuidRegex})`, 
+	validatePermissions(Resources.SHELTER, Actions.UPDATE), 
 	validator.validate({schema: 'shelterSchema', data: 'body', strictRequiredChecks: false}),
 	asyncHandler(shelterRouter.updateSome)
 );
-router.delete('/abrigos/:id', 
+router.delete(`/abrigos/:id(${uuidRegex})`, 
+	validatePermissions(Resources.SHELTER, Actions.DELETE), 
 	asyncHandler(shelterRouter.delete)
 );
 
 router.get('/pets', 
+	validatePermissions(Resources.PET, Actions.READ), 
 	asyncHandler(petRouter.getAll)
 );
-router.get('/pets/:id', 
+router.get(`/pets/:id(${uuidRegex})`, 
+	validatePermissions(Resources.PET, Actions.READ), 
 	asyncHandler(petRouter.getOneById)
 );
 router.post('/pets', 
+	validatePermissions(Resources.PET, Actions.CREATE), 
 	validator.validate({schema: 'petSchema', data: 'body'}),
 	asyncHandler(petRouter.create)
 );
-router.put('/pets/:id', 
+router.put(`/pets/:id(${uuidRegex})`, 
+	validatePermissions(Resources.PET, Actions.UPDATE), 
 	validator.validate({schema: 'petSchema', data: 'body'}),
 	asyncHandler(petRouter.updateAll)
 );
-router.patch('/pets/:id', 
+router.patch(`/pets/:id(${uuidRegex})`, 
+	validatePermissions(Resources.PET, Actions.UPDATE), 
 	validator.validate({schema: 'petSchema', data: 'body', strictRequiredChecks: false}),
 	asyncHandler(petRouter.updateSome)
 );
-router.delete('/pets/:id', 
+router.delete(`/pets/:id(${uuidRegex})`, 
+	validatePermissions(Resources.PET, Actions.DELETE), 
 	asyncHandler(petRouter.delete)
 );
 

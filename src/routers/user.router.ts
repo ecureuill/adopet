@@ -3,7 +3,7 @@ import UserController from '../controller/user.controller';
 
 export default class UserRouter {
 	async auth(request: Request, response: Response){
-		const controller = new UserController();
+		const controller = new UserController(response.locals.user);
 
 		const { email, password } = request.body;
 
@@ -13,7 +13,7 @@ export default class UserRouter {
 	}
 
 	async create(request: Request, response: Response){
-		const controller = new UserController();
+		const controller = new UserController(response.locals.user);
 
 		const result = await controller.create(request.body);
 
@@ -21,7 +21,10 @@ export default class UserRouter {
 	}
 
 	async getAll(request: Request, response: Response){
-		const controller = new UserController();
+		console.debug('UserRouter');
+		
+		const controller = new UserController(response.locals.user);
+		
 		const result = await controller.getAll();
 
 		if(result.count === 0)
@@ -31,8 +34,14 @@ export default class UserRouter {
 	}
 
 	async getOneById(request: Request, response: Response){
-		const controller = new UserController();
 
+		console.debug('response.locals');
+		console.debug(response.locals);
+
+		const controller = new UserController(response.locals.user);
+
+
+		console.debug(request.params);
 		const { id } = request.params;
 
 		const result = await controller.getOneById(id);
@@ -41,7 +50,7 @@ export default class UserRouter {
 	}
 
 	async updateAll(request: Request, response: Response){
-		const controller = new UserController();
+		const controller = new UserController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -51,7 +60,7 @@ export default class UserRouter {
 	}
 
 	async updateSome(request: Request, response: Response){
-		const controller = new UserController();
+		const controller = new UserController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -61,7 +70,7 @@ export default class UserRouter {
 	}
 
 	async delete(request: Request, response: Response) {
-		const controller = new UserController();
+		const controller = new UserController(response.locals.user);
 
 		const { id } = request.params;
 

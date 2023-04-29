@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 
 import TutorController from '../controller/tutor.controller';
+import { Tutor } from '../entities/Tutor';
 
 export default class TutorRouter {
 	async getAll(request: Request, response: Response){
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 		const result = await controller.getAll();
 
 		if(result.count === 0)
@@ -14,7 +15,7 @@ export default class TutorRouter {
 	}
 
 	async getOneById(request: Request, response: Response){
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -24,7 +25,7 @@ export default class TutorRouter {
 	}
 
 	async create(request: Request, response: Response){
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 
 		const result = await controller.create(request.body);
 
@@ -32,7 +33,7 @@ export default class TutorRouter {
 	}
 
 	async updateAll(request: Request, response: Response){
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -42,7 +43,7 @@ export default class TutorRouter {
 	}
 
 	async updateSome(request: Request, response: Response){
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 
 		const { id } = request.params;
 
@@ -52,7 +53,7 @@ export default class TutorRouter {
 	}
 
 	async delete(request: Request, response: Response) {
-		const controller = new TutorController();
+		const controller = new TutorController(response.locals.user);
 
 		const { id } = request.params;
 

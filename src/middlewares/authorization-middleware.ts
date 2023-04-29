@@ -1,22 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import createError from 'http-errors';
-import { Action, Resource, Role } from '../types/enums';
+import { Action, Resource } from '../types/enums';
 import { checkGrant, getPermission } from '../services/permissions';
 import { Actions } from '../utils/consts';
 import { IUserSettings } from '../types/interfaces';
-
-export const validateAuthorization = (roles: Role[]) =>  (request: Request, response: Response, next: NextFunction) => {
-	console.debug('validateAuthorization MIDDLEWARE');
-
-	const validation = roles.includes(response.locals.user.role);
-
-	if(!validation){
-		throw new createError.Forbidden('This action is not authorized');
-	}
-	
-	return next();
-};
-
 
 export const validatePermissions = (resource: Resource, action: Action) => (request: Request, response: Response, next: NextFunction)  => {
 	

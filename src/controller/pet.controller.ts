@@ -1,33 +1,44 @@
-import { EntityNotFoundError } from 'typeorm';
+import Controller from '.';
 import { dataSource } from '../database/datasource/data-source';
 import { Pet } from '../entities/Pet';
-import { Variant } from '../utils';
-import { idReplacememtIsNotAllowed } from '../services/validations';
+import { Shelter } from '../entities/Shelter';
+import { checkPetOwner, idReplacememtIsNotAllowed } from '../services/validations';
+import { IUserSettings } from '../types/interfaces';
 
-export default class PetController {
-	
-	async getAll(){
-		const repository = dataSource.getRepository(Pet);
 
-		console.debug('Loading all pets from database');
-		const [entities, count] = await repository.findAndCount();
-		console.debug(entities);
-		console.debug(`count ${count}`);
 
-		return { entities, count };
-	}
 
-	async getOneById(id: string){
+export default class PetController extends Controller<Pet> {
 
-		const repository = dataSource.getRepository(Pet);
-
-		console.debug('Loading one pet from database');
-		const entity = await repository.findOneByOrFail({id: id});
-
-		return entity;
+	constructor(userSettings: IUserSettings){
+		super(
+			{
+				userSettings: userSettings, 
+				idColumnName: 'id',
+				ownerColumnName: 'shelterId',
+				alias: 'pet'
+			}, 
+			Pet,
+			[
+				{
+					property: 'pet.shelter',
+					alias: 'shelter',
+				}
+			],
+			checkPetOwner,
+			Shelter.getShelterIdByUser
+		);
+		
 	}
 
 	async create(pet: Pet){
+		console.debug('create');
+		if(this.getOwnerRequired()){
+			console.debug('ownershipRequired');
+
+			const result = await checkPetOwner(pet, this.getUserId());
+			console.log(result);
+		}
 
 		const repository = dataSource.getRepository(Pet);
 		await repository.save(pet);
@@ -37,51 +48,18 @@ export default class PetController {
 		return pet;
 	}
 
-	async updateAll(pet: Pet, id: string){
-		const repository = dataSource.getRepository(Pet);
-	
-		idReplacememtIsNotAllowed(pet.id, id);
+	async updateAll(entity: Pet, id: string){
 
-		const exist = await repository.exist({where: {id: id}});
+		const petEntity = await Pet.findOneByOrFail({id: id});
 
-		if(!exist)
-			throw new EntityNotFoundError(Pet, {id: id});
-
-		await repository.save(pet);
-	
-		console.debug(`update pet ${pet.id}`);
-
-		return pet;
-	}
-
-	async updateSome(body: object, id: string){
-		const repository = dataSource.getRepository(Pet);
+		if(entity.id === undefined || entity.id === '') 
+			entity.id = id;
 		
-		const  pet = await repository.findOneByOrFail({id: id});
-		
-		for (const key of Object.keys(body)) {
-			(pet as unknown as Variant)[key] = (body as Variant)[key];
-		}
+		if(entity.shelterId === undefined || entity.id === '')
+			entity.shelterId = petEntity.shelterId;
 
-		idReplacememtIsNotAllowed(pet.id, id);
+		idReplacememtIsNotAllowed(entity.shelterId, petEntity.shelterId);
 
-		console.debug(pet);
-		
-		await repository.save(pet);
-	
-		console.debug(`update pet ${pet.id}`);
-
-		return pet;
-	}
-
-	async delete(id: string){
-		
-		const repository = dataSource.getRepository(Pet);
-
-		const pet = await repository.findOneByOrFail({id: id});
-	
-		await repository.remove(pet);
-		
-		console.debug(`delete pet ${pet.id}`);
+		return super.updateAll(entity, id);
 	}
 } 

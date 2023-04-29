@@ -1,6 +1,9 @@
 import createError from 'http-errors';
 import { IUserSettings } from '../types/interfaces';
 import { checkAllIncluded } from './permissions';
+import createHttpError from 'http-errors';
+import { Shelter } from '../entities/Shelter';
+import { Pet } from '../entities/Pet';
 
 export const phoneRegex = '^\\s*(\\d{2}|\\d{0})[-. ]?(\\d{5}|\\d{4})[-. ]?(\\d{4})[-. ]?\\s*$';
 
@@ -32,7 +35,7 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 
 	console.debug('isPropertyUpdateAllowedOrFail');
 	console.debug(permission);
-	console.debug(Object.keys(body));
+	// console.debug(Object.keys(body));
 
 	if(permission.excluded !== undefined){
 		const key = Object.keys(body).find( key => permission.excluded?.includes(key));
@@ -56,4 +59,15 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 	}
 
 	return true;
+};
+
+
+export const checkPetOwner = async (pet: Pet, userId: string) => {
+	console.debug('checkPetOwner');
+	const shelter = await Shelter.findOneBy({id: pet.shelterId});
+
+	if(shelter === null)
+		throw new createHttpError.BadRequest('Shelter does not exist');
+		
+	return isOwnerOrFail(shelter.userId, userId);
 };

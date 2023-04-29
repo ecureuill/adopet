@@ -32,4 +32,10 @@ export class Shelter extends BaseEntity implements IShelter{
 	updateInactive(){
 		this.inactive = true;
 	}
+
+	public static async getShelterIdByUser(userId: string){
+		const shelter = await Shelter.findOneByOrFail({userId: userId});
+
+		return shelter.id;
+	}
 }
