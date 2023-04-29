@@ -1,10 +1,10 @@
 /* eslint-disable indent */
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 import { ITutor } from '../types/schemas';
 
 @Entity('Tutor')
-export class Tutor implements ITutor {
+export class Tutor extends BaseEntity implements ITutor {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -17,4 +17,14 @@ export class Tutor implements ITutor {
 	@OneToOne(() => User, { cascade: true })
 	@JoinColumn()
 	user: User;
+
+	@Column('uuid')
+	userId: string;
+
+	constructor();
+	constructor(tutor: Tutor);
+	constructor(tutor?: Tutor){
+		super();
+		Object.assign(this, tutor);
+	}
 }

@@ -1,10 +1,10 @@
 /* eslint-disable indent */
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/enums';
 import { IUser } from '../types/schemas';
 
 @Entity('User')
-export class User implements IUser {
+export class User extends BaseEntity implements IUser {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -31,4 +31,14 @@ export class User implements IUser {
 
 	@Column({nullable: true})
 	state: string;
+
+	@DeleteDateColumn()
+	delete_date: string;
+
+	constructor();
+	constructor(user: IUser);
+	constructor(user?: IUser){
+		super();
+		Object.assign(this, user);
+	}
 }

@@ -1,11 +1,11 @@
 /* eslint-disable indent */
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Shelter } from './Shelter';
 import { AgeUnit, PetType, SizeVariety } from '../types/enums';
 import { IPet } from '../types/schemas';
 
 @Entity('Pet')
-export class Pet implements IPet{
+export class Pet extends BaseEntity implements IPet{
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -48,6 +48,9 @@ export class Pet implements IPet{
 	@UpdateDateColumn()
 	update_date: string;
 
+	@DeleteDateColumn()
+	delete_date: string;
+
 	@ManyToOne(() => Shelter, (shelter) => shelter.pets, {
 		onDelete: 'CASCADE',
 		orphanedRowAction: 'delete', 
@@ -55,6 +58,6 @@ export class Pet implements IPet{
 	})
 	shelter: Shelter;
 
-	@Column({type: 'uuid'})
+	@Column('uuid')
 	shelterId: string;
 }

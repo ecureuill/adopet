@@ -31,7 +31,9 @@ export interface ITutor {
 }
 
 export interface IShelter {
-	id: string;
+	id: string,
+	userId: string,
+	inactive: boolean,
 	pets: Array<IPet>,
 	user: IUser
 }

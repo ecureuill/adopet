@@ -135,13 +135,15 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 	additionalProperties: false,
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
+		inactive: {type: 'boolean'},
 		pets: {
 			type: 'array',
 			items: petSchema,
 			$id: 'shelter-petSchema',
 			uniqueItems: true,
 		},
-		user: userSchema
+		user: userSchema,
+		userId: { $ref: 'definitionsSchema#/definitions/uuid'}
 	},
 	required: ['user'],
 	minProperties: 1 //avoid empty body on
