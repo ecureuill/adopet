@@ -1,3 +1,5 @@
+import { Actions, Resources } from '../utils/consts';
+
 export enum PetType {
 	DOG = 'dog',
 	CAT = 'cat'
@@ -28,3 +30,7 @@ export enum Role {
 	TUTOR = 'tutor',
 	SHELTER = 'shelter'
 }
+
+export type Resource = typeof Resources[keyof typeof Resources];
+
+export type Action = typeof Actions[keyof typeof Actions];
