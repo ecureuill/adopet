@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { EntityNotFoundError, QueryFailedError } from 'typeorm';
+import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
 import { HttpError } from 'http-errors';
 
 
@@ -21,5 +21,12 @@ export const handleTypeORMError = (error: HttpError, request: Request, response:
 
 		});
 
+	if(error instanceof TypeORMError)
+		return response.status(501).json({
+			error_name: `TypeORMErrorGENERIC ${error.name}`,
+			error_msg: error.message,
+			message: error.message
+
+		});
 	next(error);
 };

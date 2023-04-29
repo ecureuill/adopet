@@ -5,11 +5,10 @@ export const handleSchemaError = (error: JSONSchemaValidatorError, request: Requ
 
 	if (error instanceof JSONSchemaValidatorError){
 
-		console.debug('JSONSchemaValidatorError');
 		return response.status(404).json({
 			error_name: error.name,
 			error_msg: error.ajvError.message,
-			message: error.message
+			params: error.ajvError.params
 		});
 	}
 
