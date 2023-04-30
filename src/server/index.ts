@@ -19,6 +19,10 @@ app.use(handleSchemaError);
 app.use(handleTypeORMError);
 app.use(handleError);
 
-export const server = app.listen(process.env.DEV_PORT, ()=> {
-	console.log(`Server is on! ${process.env.BASE_URL}:${process.env.DEV_PORT}`);
-});
+
+export const startServer = () => app.listen(
+	process.env.NODE_ENV === 'test'? process.env.TEST_PORT: process.env.DEV_PORT, 
+	()=> {
+		console.log(`Server is on! ${process.env.BASE_URL}:${process.env.DEV_PORT}`);
+	}
+);
