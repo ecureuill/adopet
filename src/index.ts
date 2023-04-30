@@ -1,28 +1,11 @@
-import express from 'express';
-import * as dotenv from 'dotenv';
-import cors from 'cors';
 
-import { dataSource } from './database/datasource/data-source';
-import { router } from './routers';
-import { handleError } from './middlewares/error-handlers/handlerError';
-import { handleTypeORMError } from './middlewares/error-handlers/handleTypeORMError';
-import { handleSchemaError } from './middlewares/error-handlers/handleSchemaError';
+import { closeConnection, openConnection } from './database/datasource/data-source';
+import { startServer } from './server';
 
-dotenv.config();
-export const app = express();
+const server = startServer();
 
-console.debug(`AppDataSource.isConnected ${dataSource.isConnected}`);
+server.on('listening', async () => await openConnection() );
 
-app.use(express.json());
+server.on('connection', () => console.debug('Hiiii'));
 
-app.use(cors());
-
-app.use(router);
-
-app.use(handleSchemaError);
-app.use(handleTypeORMError);
-app.use(handleError);
-
-app.listen(process.env.DEV_PORT, ()=> {
-	console.log(`Server is on! ${process.env.BASE_URL}:${process.env.DEV_PORT}`);
-});
+server.on('close', () => closeConnection());
