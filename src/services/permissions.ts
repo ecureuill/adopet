@@ -178,7 +178,7 @@ const userPermission: IRule = {
 	]
 };
 
-export const permissions = [petPermission, tutorPermission, shelterPermission, userPermission];
+export const permissions = {pet: petPermission, tutor: tutorPermission, shelter: shelterPermission, user: userPermission};
 
 export const getPermission = (resource: Resource) => {
 	console.debug(`getPermission for ${resource}`);

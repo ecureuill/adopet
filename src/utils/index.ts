@@ -81,5 +81,31 @@ const loopObject = (objArray: Array<object>, entityArray: Array<object>) => {
 				//To DO
 			}
 		});
+};
 
+export const clone = (obj: any) => {
+	if(obj == null || typeof(obj) != 'object')
+		return obj;
+	
+	if(Array.isArray(obj))
+	{
+		console.debug('isArray');
+		console.debug(obj);
+		const temp: any[] = [];
+		obj.forEach(item => {
+			temp.push(clone(obj));
+		});
+		return temp;
+	}
+	else
+	{
+		const temp = {...obj}; 
+		console.debug(temp);
+		Object.keys(obj).forEach(key => {
+			console.debug(key);
+			temp[key] = clone(obj[key]);
+		});
+
+		return temp;
+	}
 };

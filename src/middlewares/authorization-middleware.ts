@@ -5,7 +5,7 @@ import { checkGrant, getPermission } from '../services/permissions';
 import { Actions } from '../utils/consts';
 import { IUserSettings } from '../types/interfaces';
 
-export const validatePermissions = (resource: Resource, action: Action) => (request: Request, response: Response, next: NextFunction)  => {
+const validatePermissions = (resource: Resource, action: Action) => (request: Request, response: Response, next: NextFunction)  => {
 	
 	console.debug('validatePermissions MIDDLEWARE');
 
@@ -58,3 +58,5 @@ export const validatePermissions = (resource: Resource, action: Action) => (requ
 
 	throw new createError.Forbidden('This action is not authorized');
 };
+
+export default validatePermissions;

@@ -7,7 +7,7 @@ import SchemaValidator from '../middlewares/SchemaValidator';
 import schemas from '../services/schemas';
 import UserRouter from './user.router';
 import { JWTVerify } from '../middlewares/jwt-middleware';
-import { validatePermissions } from '../middlewares/authorization-middleware';
+import validatePermissions from '../middlewares/authorization-middleware';
 import { Resources, Actions } from '../utils/consts';
 
 export const router = Router();

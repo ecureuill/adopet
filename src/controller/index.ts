@@ -5,7 +5,7 @@ import { getSelectableColumns } from '../utils/querybuilder';
 import { idReplacememtIsNotAllowed, isOwnerOrFail, isPropertyUpdateAllowedOrFail, isPutAllowedOrFail } from '../services/validations';
 import { assignProperties } from '../utils';
 
-type settings = {
+export type settings = {
 	userSettings: IUserSettings,
 	idColumnName: string,
 	ownerColumnName: string,
@@ -76,6 +76,38 @@ export default class Controller<TEntity extends ObjectLiteral> {
 
 		if(this._fnGetOwnerIdByUserId === undefined)
 			this._fnGetOwnerIdByUserId = (async (userId: string) => userId);
+	}
+
+	getRepository(){
+		return this.repository;
+	}
+
+	getUserSettings(){
+		return this._userSettings;
+	}
+
+	getIdColumnName(){
+		return this._idColumnName;
+	}
+
+	getOwnerColumnName(){
+		return this._ownerColumnName;
+	}
+
+	getAlias(){
+		return this._alias;
+	}
+
+	getJoinQuery(){
+		return this._joinQuery;
+	}
+
+	getFnIsOwnerOrFail(){
+		return this._fnIsOwnerOrFail;
+	}
+
+	getFnGetOwnerIdByUserId(){
+		return this._fnGetOwnerIdByUserId;
 	}
 
 	protected getOwnerRequired(){

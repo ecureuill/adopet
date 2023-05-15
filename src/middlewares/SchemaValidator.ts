@@ -19,7 +19,7 @@ export default class SchemaValidator {
 		addFormats(this.ajv);
 	}
 
-	validate = ({schema, data, strictRequiredChecks}: SchemaValidatorProperties) => {
+	validate({schema, data, strictRequiredChecks}: SchemaValidatorProperties){
 
 		if(strictRequiredChecks === undefined)
 			strictRequiredChecks = true;
@@ -50,5 +50,5 @@ export default class SchemaValidator {
 			
 			return next();
 		};
-	};
+	}
 }
