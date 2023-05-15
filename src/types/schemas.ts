@@ -1,7 +1,7 @@
 import { Role } from './enums';
 
 export interface IUser {
-	id: string;
+	id: `${string}-${string}-${string}-${string}-${string}` | string;
 	role: Role
 	email: string;
 	password: string;
@@ -9,10 +9,11 @@ export interface IUser {
 	phone?: string;
 	city?: string;
 	state?: string;
+	delete_date?: string;
 }
 
 export interface IPet {
-	id: string;
+	id: `${string}-${string}-${string}-${string}-${string}` | string;
 	name: string;
 	age: number;
 	age_unit: 'y'| 'd' | 'm' ;
@@ -20,20 +21,26 @@ export interface IPet {
 	type: 'dog' | 'cat';
 	adopted: boolean;
 	photo?: string | Buffer;
-	shelterId: string;
+	shelterId: `${string}-${string}-${string}-${string}-${string}` | string;
+	delete_date?: string;
+	create_date?: string;
+	update_date?: string;
 }
 
 export interface ITutor {
-	id: string;
+	id: `${string}-${string}-${string}-${string}-${string}` | string;
+	userId: `${string}-${string}-${string}-${string}-${string}` | string,
 	photo?: string | Buffer,
 	about?: string,
 	user: IUser
+	delete_date?: string;
 }
 
 export interface IShelter {
-	id: string,
-	userId: string,
+	id: `${string}-${string}-${string}-${string}-${string}` | string,
+	userId: `${string}-${string}-${string}-${string}-${string}` | string,
 	inactive: boolean,
 	pets: Array<IPet>,
 	user: IUser
+	delete_date?: string;
 }

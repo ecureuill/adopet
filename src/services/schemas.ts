@@ -1,6 +1,6 @@
 import {JSONSchemaType} from 'ajv';
 import { IPet, ITutor, IShelter, IUser } from '../types/schemas';
-import { phoneRegex } from './validations';
+import { phoneRegex, stateRegex } from './validations';
 
 const definitionsSchema = {
 	$id: 'definitionsSchema',
@@ -8,11 +8,14 @@ const definitionsSchema = {
 	definitions: {
 		'non-empty-string': {
 			type: 'string',
+			transform: ['trim'],
 			minLength: 1,
 		},
 		'non-nullable-empty-string': {
 			type: 'string',
+			transform: ['trim'],
 			minLength: 1,
+			nullable: true
 		},
 		uuid: {
 			type: 'string',
@@ -39,6 +42,8 @@ const definitionsSchema = {
 		state: {
 			type: 'string', 
 			nullable: true,
+			transform: ['trim'],
+			pattern: stateRegex,
 			minLength: 2,
 			maxLength: 2
 		},
@@ -68,6 +73,7 @@ const userSchema: JSONSchemaType<IUser> = {
 		phone: {$ref: 'definitionsSchema#/definitions/phone'},
 		city: {$ref: 'definitionsSchema#/definitions/non-empty-string'},
 		state: {$ref: 'definitionsSchema#/definitions/state'},
+		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 	},
 	additionalProperties: false,
 	minProperties: 1,
@@ -81,7 +87,9 @@ export const tutorSchema: JSONSchemaType<ITutor> = {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
 		about: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
-		user: userSchema
+		user: userSchema,
+		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		userId: { $ref: 'definitionsSchema#/definitions/uuid'},
 
 	},
 	additionalProperties: false,
@@ -122,7 +130,10 @@ export const petSchema: JSONSchemaType<IPet> = {
 		shelterId: {
 			type: 'string',
 			format: 'uuid'
-		}
+		},
+		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		create_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		update_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 	},
 	minProperties: 1,
 	additionalProperties: false,
@@ -135,6 +146,8 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 	additionalProperties: false,
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
+		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		userId: { $ref: 'definitionsSchema#/definitions/uuid'},
 		inactive: {type: 'boolean'},
 		pets: {
 			type: 'array',
@@ -143,7 +156,6 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 			uniqueItems: true,
 		},
 		user: userSchema,
-		userId: { $ref: 'definitionsSchema#/definitions/uuid'}
 	},
 	required: ['user'],
 	minProperties: 1 //avoid empty body on

@@ -268,6 +268,18 @@ describe('definitions schema validation', () => {
 		expect(nextFunction).not.toBeCalled();
 	});
 
+	it('should throw for state="  "', () => {
+		mockRequest = {
+			body:{
+				state: '  '
+			}
+		};
+		
+		expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+		).toThrow(`/state ${SCHEMA_ERRORS_CODE.minLength}`);
+		expect(nextFunction).not.toBeCalled();
+	});
+
 	it('should throw for state="abc"', () => {
 		mockRequest = {
 			body:{
