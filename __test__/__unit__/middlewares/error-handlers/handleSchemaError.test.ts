@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { JSONSchemaValidatorError } from '../../../../src/utils/JSONSchemaValidatorError';
 import {ErrorObject}  from 'ajv';
 import { handleSchemaError } from '../../../../src/middlewares/error-handlers/handleSchemaError';
-import { getMockResponse } from '../../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../../utils/mocks';
 
 describe('Schema error handler middleware', () => {
 	const ajvErros: ErrorObject[] = [
@@ -28,7 +28,7 @@ describe('Schema error handler middleware', () => {
 	const nextFunction: NextFunction = jest.fn();
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 

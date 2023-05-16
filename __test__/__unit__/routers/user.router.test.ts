@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { faker } from '@faker-js/faker/locale/pt_BR';
 import { User } from '../../../src/entities/User';
 import { generateUserData, generateUsersData } from '../../utils/generate';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 describe('User router', () => {
 	let controller: jest.SpyInstance;
@@ -13,7 +13,7 @@ describe('User router', () => {
 	let mockRequest: Partial<Request>;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 

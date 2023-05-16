@@ -4,7 +4,7 @@ import ShelterRouter from '../../../src/routers/shelter.router';
 import { Request, Response } from 'express';
 import { generateShelterData, generateSheltersData } from '../../utils/generate';
 import { Shelter } from '../../../src/entities/Shelter';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 let mockRequest: Partial<Request>;
 let mockResponse: Partial<Response>;
@@ -13,7 +13,7 @@ describe('Shelter Router', () => {
 	let controller: jest.SpyInstance;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 

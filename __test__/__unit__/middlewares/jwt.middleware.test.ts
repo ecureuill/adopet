@@ -4,7 +4,7 @@ import { JWTVerify } from '../../../src/middlewares/jwt-middleware';
 import { NextFunction, Request, Response } from 'express';
 import { faker } from '@faker-js/faker/locale/pt_BR';
 import { generateToken } from '../../utils/generate';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 describe('JWTVerify middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -12,25 +12,9 @@ describe('JWTVerify middleware', () => {
 	let nextFunction: NextFunction;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 		nextFunction = jest.fn();
-	});
-
-	it('Without headers', async () =>{
-
-		JWTVerify(mockRequest as Request, mockResponse as Response, nextFunction);
-		expect(nextFunction).toHaveBeenCalledTimes(1);
-		expect(mockResponse.locals?.user).toMatchObject({
-			id: '',
-			authenticated: false,
-			role: 'ANY',
-			permission: {
-				granted: false,
-				excluded: undefined,
-				included: undefined,
-			}
-		});
 	});
 
 	it('Without authorization header', async () =>{

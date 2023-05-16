@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import createHttpError, { HttpError } from 'http-errors';
 import { handleError } from '../../../../src/middlewares/error-handlers/handlerError';
-import { getMockResponse } from '../../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../../utils/mocks';
 
 describe('Error handler middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -9,7 +9,7 @@ describe('Error handler middleware', () => {
 	const nextFunction: NextFunction = jest.fn();
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 

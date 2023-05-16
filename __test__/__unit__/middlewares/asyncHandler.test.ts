@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { asyncHandler } from '../../../src/middlewares/asyncHandler';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 describe('asyncHandler middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -8,7 +8,7 @@ describe('asyncHandler middleware', () => {
 	let nextFunction: NextFunction;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 		nextFunction = jest.fn();
 

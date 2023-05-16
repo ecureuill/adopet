@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import validatePermissions from '../../../src/middlewares/authorization-middleware';
 import { Actions, Resources } from '../../../src/utils/consts';
 import { randomUUID } from 'crypto';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 describe('Authorization middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -10,7 +10,7 @@ describe('Authorization middleware', () => {
 	let nextFunction: NextFunction;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 		mockResponse.locals = {
 			user: {

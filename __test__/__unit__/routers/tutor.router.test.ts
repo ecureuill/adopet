@@ -4,7 +4,7 @@ import TutorRouter from '../../../src/routers/tutor.router';
 import { Request, Response } from 'express';
 import { generateTutorData, generateTutorsData } from '../../utils/generate';
 import { Tutor } from '../../../src/entities/Tutor';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 let mockRequest: Partial<Request>;
 let mockResponse: Partial<Response>;
@@ -13,7 +13,7 @@ describe('Tutor Router', () => {
 	let controller: any;
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 
