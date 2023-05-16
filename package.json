@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --watch --silent ",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --watch ",
     "test:coverage": "cross-env NODE_ENV=test jest --detectOpenHandles --coverage --collectCoverageFrom='./src/**' --watch --silent ",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:run": "typeorm-ts-node-commonjs migration:run --dataSource ./src/database/datasource/data-source.ts",
