@@ -192,7 +192,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		if(this._userSettings.permission.ownershipRequired)
 			await this._fnIsOwnerOrFail(entity, this._userSettings.id);
 
-		isPutAllowedOrFail({ permission: this._userSettings.permission } as IUserSettings);
+		isPutAllowedOrFail({ permission: this._userSettings.permission } as IUserSettings, this._joinQuery.length);
 
 		idReplacememtIsNotAllowed(entity[this._idColumnName], id);
 		
@@ -211,7 +211,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 	
 		idReplacememtIsNotAllowed((body as TEntity).id, id);
 
-		isPropertyUpdateAllowedOrFail(body, {permission: this._userSettings.permission} as IUserSettings);
+		isPropertyUpdateAllowedOrFail(body, {permission: this._userSettings.permission} as IUserSettings, this._joinQuery.length);
 	
 		console.debug(entity);
 

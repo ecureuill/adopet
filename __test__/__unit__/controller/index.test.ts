@@ -19,7 +19,7 @@ describe('Generic Controller', () => {
 				id: randomUUID(),
 				permission: {
 					granted: true,
-					excluded: undefined,
+					excluded: [],
 					included: undefined,
 					ownershipRequired: false
 				},

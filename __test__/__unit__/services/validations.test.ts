@@ -126,39 +126,118 @@ describe('isPutAllowedOrFail', () =>{
 		};
 	});
 
-	it('Should return true', ()=>{
+	it('Should return true for [*] and 0 relations', ()=>{
 
 		userSettings.permission.included =  ['*'];
 
-		expect(isPutAllowedOrFail(userSettings)).toEqual(true);
+		expect(isPutAllowedOrFail(userSettings, 0)).toEqual(true);
 	});
 
+	it('Should throw error for [*] and 1 relations', ()=>{
+
+		userSettings.permission.included =  ['*'];
+
+		try {
+			isPutAllowedOrFail(userSettings, 1);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toEqual('PUT is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
+	});
+
+	it('Should throw error for [*, user.email,pets.*] and 2 relations', ()=>{
+
+		userSettings.permission.included =  ['*', 'user.email', 'pets.*'];
+
+		try {
+			isPutAllowedOrFail(userSettings, 2);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toEqual('PUT is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
+	});
+
+	it('Should return true for [*, user.*, pets.*] and 2 relations', ()=>{
+
+		userSettings.permission.included =  ['*', 'user.*', 'pets.*'];
+
+		expect(isPutAllowedOrFail(userSettings, 0)).toEqual(true);
+	});
+
+
 	it('Should throw error for undefined,undefined', ()=>{
-		expect(() => isPutAllowedOrFail(userSettings)).toThrow('PUT is not authorized');
+		try {
+			isPutAllowedOrFail(userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
+			expect(err.message).toEqual('Permissions are misconfigured');
+		}
+		finally{
+			expect.assertions(2);
+		}
+
+
 	});
 
 	it('Should throw error [id],undefined', ()=>{
 		userSettings.permission.included =  ['id'];
-		expect(() => isPutAllowedOrFail(userSettings)).toThrow('PUT is not authorized');
+
+		try {
+			isPutAllowedOrFail(userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toEqual('PUT is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
 	it('Should throw error for undefined,[id]', ()=>{
 
 		userSettings.permission.excluded =  ['id'];
-
-		expect(() => isPutAllowedOrFail(userSettings)).toThrow('PUT is not authorized');
+		
+		try {
+			isPutAllowedOrFail(userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toEqual('PUT is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
-	it('Should throw error undefined,[]', ()=>{
+	it('Should return true for undefined,[]', ()=>{
 
 		userSettings.permission.excluded = [];
-		expect(() => isPutAllowedOrFail(userSettings)).toThrow('PUT is not authorized');
+		expect(isPutAllowedOrFail(userSettings, 0)).toEqual(true);
 	});
 
 	it('Should throw error [],undefined', ()=>{
-
+		
 		userSettings.permission.included = [];
-		expect(() => isPutAllowedOrFail(userSettings)).toThrow('PUT is not authorized');
+		try {
+			isPutAllowedOrFail(userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toEqual('PUT is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 });
 
@@ -184,39 +263,96 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 
 	it('Should throw for undefined,undefined', () => {
 		try{
-			isPropertyUpdateAllowedOrFail(shelter, userSettings);
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
 		}
-		catch(err){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
+			expect(err.message).toEqual('Permissions are misconfigured');
 		}
 		finally{
-			expect.assertions(1);
+			expect.assertions(2);
+		}
+	});
+
+	it('Should throw for [],[]', () => {
+		userSettings.permission.excluded = ['id'];
+		userSettings.permission.included = ['id'];
+		try{
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
+			expect(err.message).toEqual('Permissions are misconfigured');
+		}
+		finally{
+			expect.assertions(2);
 		}
 	});
 
 	it('Should throw for excluded id', () => {
 		userSettings.permission.excluded = ['id'];
-		expect(() => isPropertyUpdateAllowedOrFail(shelter, userSettings)).toThrow();
+		try {
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toContain('update is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
 	it('Should throw for everything but id', () => {
 		userSettings.permission.included = ['id'];
-		expect(() => isPropertyUpdateAllowedOrFail(shelter, userSettings)).toThrow();
+		try {
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toContain('update is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
 	it('Should throw for user and pets properties', () => {
 		userSettings.permission.included = ['*'];
-		expect(() => isPropertyUpdateAllowedOrFail(shelter, userSettings)).toThrow();
+		try {
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 2);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toContain('update is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
 	it('Should throw for pets properties', () => {
 		userSettings.permission.included = ['*', 'user.*'];
-		expect(() => isPropertyUpdateAllowedOrFail(shelter, userSettings)).toThrow();
+		try {
+			isPropertyUpdateAllowedOrFail(shelter, userSettings, 2);
+		}
+		catch(err: any){
+			expect(err).toBeInstanceOf(createHttpError.Forbidden);
+			expect(err.message).toContain('update is not authorized');
+		}
+		finally{
+			expect.assertions(2);
+		}
 	});
 
-	it('Should not throw', () => {
+	it('Should not throw for [*] and 0 relations', () => {
+		userSettings.permission.included = ['*'];
+		expect(isPropertyUpdateAllowedOrFail(shelter, userSettings, 0)).toEqual(true);
+	});
+
+	it('Should not throw for all relations included', () => {
 		userSettings.permission.included = ['*', 'user.*', 'pets.*'];
-		expect(isPropertyUpdateAllowedOrFail(shelter, userSettings)).toEqual(true);
+		expect(isPropertyUpdateAllowedOrFail(shelter, userSettings, 2)).toEqual(true);
 	});
 });
 

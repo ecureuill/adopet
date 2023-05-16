@@ -225,3 +225,14 @@ export const checkGrant = (permission: IActionPermission, role?: Role) => {
 export const checkAllIncluded = (included: string[]) => {
 	return included.every(p => /\*/.test(p));
 };
+
+export const isPropertiesPermissionMisconfigured = ({excluded, included}: any) => {
+
+	if(excluded === undefined && included === undefined) 
+		return true;
+
+	if(excluded !== undefined && included !== undefined)
+		return true;
+
+	return false;
+};
