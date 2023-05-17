@@ -1,6 +1,8 @@
 import { ObjectLiteral, Repository, SelectQueryBuilder} from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
+import { isPropertiesPermissionMisconfigured } from '../services/permissions';
+import createHttpError from 'http-errors';
 
 export const getRelations = (relations: RelationMetadata[]) => relations.map( relation => relation.propertyName);
 
@@ -32,6 +34,9 @@ export const getSelectableColumns = <Entity extends ObjectLiteral>(repository: R
 	let selectOpt: string[] = [];
 	
 	console.debug('queryBuilder');
+
+	if(isPropertiesPermissionMisconfigured({excluded: columnsToExclude, included: columnsToInclude}))
+		throw new createHttpError.InternalServerError('Permissions are misconfigured');
 
 	if(columnsToExclude !== undefined){
 		selectOpt = getEntityColumns(repository.metadata.columns, alias, (column => !columnsToExclude.includes(column)));

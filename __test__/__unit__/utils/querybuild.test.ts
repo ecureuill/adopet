@@ -21,22 +21,21 @@ describe('querybuild function', () => {
 	
 	afterAll(() => closeConnection());
 
-	it('should retrieve nothing for [],[]', () =>{
-		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', [], []);
-
-		expect(selectionCol.length).toEqual(0);
+	it('should throw for [],[]', () =>{
+		expect(() => getSelectableColumns(Shelter.getRepository(), 'shelter', [], [])).toThrow('Permissions are misconfigured');
 	});
 
-	it('should retrieve nothing for undefined, undefined', () =>{
-		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', undefined, undefined);
-
-		expect(selectionCol.length).toEqual(0);
+	it('should throw for undefined, undefined', () =>{
+		expect(() => getSelectableColumns(Shelter.getRepository(), 'shelter', undefined, undefined)).toThrow('Permissions are misconfigured');
 	});
 
-	it('should retrieve nothing for undefined,[]', () =>{
+	it('should retrieve all for undefined,[]', () =>{
+		const allcols = [...entityCol, ...petCol, ...userCol];
+
 		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', [], undefined);
 
-		expect(selectionCol.length).toEqual(0);
+		expect(selectionCol.length).toEqual(allcols.length);
+		expect(selectionCol.sort()).toEqual(allcols.sort());
 	});
 
 	it('should retrieve nothing for [],undefined', () =>{
@@ -55,49 +54,65 @@ describe('querybuild function', () => {
 		expect(selectionCol.sort()).toEqual(allcols.sort());
 	});
 
-	it('should retrieve all columns for  [], [*, user.*, pets.*]', () =>{
+	it('should throw for  [], [*, user.*, pets.*]', () =>{
 		
-		const allcols = [...entityCol, ...petCol, ...userCol];
-
-		const selectionCol2 = getSelectableColumns(Shelter.getRepository(), 'shelter', [], ['*', 'user.*', 'pets.*']);
-
-		expect(selectionCol2.length).toEqual(allcols.length);
-		expect(selectionCol2.sort()).toEqual(allcols.sort());
+		expect(() => getSelectableColumns(Shelter.getRepository(), 'shelter', [], ['*', 'user.*', 'pets.*'])).toThrow('Permissions are misconfigured');
 
 	});
 
-	it('should exclude column [shelter.exclude_column]', () => {
+	it('should exclude column [shelter.delete_date]', () => {
 		const allcols = [...entityCol, ...petCol, ...userCol];
 		const excludedCol = 'shelter.delete_date';
 		const filteredCols = allcols.filter( col => col !== excludedCol);
 
-		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', [excludedCol]);
+		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', [excludedCol], undefined);
 
-		console.debug(filteredCols);
-		console.debug(selectionCol);
 		expect(selectionCol.length).toEqual(filteredCols.length);
 
 		expect(selectionCol.sort()).toEqual(filteredCols.sort());
 	});
 
-	it('should exclude column [random]', () =>{
+	it('should exclude column [user.delete_date]', () => {
 		const allcols = [...entityCol, ...petCol, ...userCol];
-		const excludedCol = allcols[Math.floor(Math.random()*allcols.length)];
+		const excludedCol = 'user.delete_date';
+		
 		const filteredCols = allcols.filter( col => col !== excludedCol);
 
-		const selectionCol2 = getSelectableColumns(Shelter.getRepository(), 'shelter', [excludedCol]);
+		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', [excludedCol]);
 
-		console.debug(excludedCol);
-		console.debug(filteredCols);
-		console.debug(selectionCol2);
+		expect(selectionCol.length).toEqual(filteredCols.length);
+
+		expect(selectionCol.sort()).toEqual(filteredCols.sort());
+	});
+
+	it('should exclude random columns', () =>{
+		const allcols = [...entityCol, ...petCol, ...userCol];
+		const excludedCols = [allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)]];
+
+		const filteredCols = allcols.filter( col => ! excludedCols.includes(col));
+
+		const selectionCol2 = getSelectableColumns(Shelter.getRepository(), 'shelter', excludedCols);
+
 		expect(selectionCol2.length).toEqual(filteredCols.length);
 
 		expect(selectionCol2.sort()).toEqual(filteredCols.sort());
 	});
 
+	it('should exclude random columns', () =>{
+		const allcols = [...entityCol, ...petCol, ...userCol];
+		const includedCols = [allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)], allcols[Math.floor(Math.random()*allcols.length)]];
 
-	it('should include column [shelter.exclude_column]', () => {
-		const column = 'shelter.delete_date';
+		const filteredCols = allcols.filter( col => includedCols.includes(col));
+
+		const selectionCol2 = getSelectableColumns(Shelter.getRepository(), 'shelter', undefined, includedCols);
+
+		expect(selectionCol2.length).toEqual(filteredCols.length);
+
+		expect(selectionCol2.sort()).toEqual(filteredCols.sort());
+	});
+	
+	it('should include column [user.delete_date]', () => {
+		const column = 'user.delete_date';
 
 		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', undefined, [column]);
 
@@ -106,8 +121,7 @@ describe('querybuild function', () => {
 		expect(selectionCol.sort()).toEqual([column].sort());
 	});
 
-
-	it('should include column [shelter.id]', () => {
+	it('should include column [shelter.delete_date]', () => {
 		const column = 'shelter.delete_date';
 
 		const selectionCol = getSelectableColumns(Shelter.getRepository(), 'shelter', undefined, [column]);
