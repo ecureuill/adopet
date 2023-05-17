@@ -19,8 +19,9 @@ const getRelationColumns = (relations: RelationMetadata[], condition: (column: s
 
 const getEntityColumns = (columns: ColumnMetadata[], alias: string, condition: (column: string) => boolean) => {
 	return columns.reduce((previous:string[], current: ColumnMetadata) => {
-		if(condition(current.databaseName))
-			previous.push(`${alias}.${current.databaseName}`);
+		const columnName = `${alias}.${current.databaseName}`;
+		if(condition(columnName))
+			previous.push(columnName);
 
 		return previous;
 	}, []);	
