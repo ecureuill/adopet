@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import { IUserSettings } from '../types/interfaces';
-import { checkAllIncluded } from './permissions';
+import { checkAllIncluded, isPropertiesPermissionMisconfigured } from './permissions';
 import createHttpError from 'http-errors';
 import { Shelter } from '../entities/Shelter';
 import { Pet } from '../entities/Pet';
@@ -23,21 +23,41 @@ export const isOwnerOrFail = (ownerId: string, id: string) => {
 	return true;
 };
 
-export const isPutAllowedOrFail = ({ permission }: IUserSettings) => {
-	if(permission.excluded !== undefined || (
-		permission.included !== undefined && !checkAllIncluded(permission.included)))
-		throw new createError.Forbidden('PUT is not authorized');
+export const isPutAllowedOrFail = ({ permission }: IUserSettings, relations: number) => {
+	
+	if(isPropertiesPermissionMisconfigured(permission))
+		throw new createError.InternalServerError('Permissions are misconfigured');
 
+	if(permission.excluded !== undefined){
+		if(permission.excluded.length === 0)
+			return true;
+
+		throw new createError.Forbidden('PUT is not authorized');
+	}
+
+	if(permission.included !== undefined){
+		if(permission.included.length === 0)
+			throw new createError.Forbidden('PUT is not authorized');
+
+		if(permission.included.length < relations + 1)
+			throw new createError.Forbidden('PUT is not authorized');
+
+		if(!checkAllIncluded(permission.included))
+			throw new createError.Forbidden('PUT is not authorized');
+	}
 	return true;
 };
 
-export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUserSettings) => {
+export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUserSettings, relations: number) => {
+	console.debug(body);
 
-	console.debug('isPropertyUpdateAllowedOrFail');
-	console.debug(permission);
-	// console.debug(Object.keys(body));
+	if(isPropertiesPermissionMisconfigured(permission))
+		throw new createError.InternalServerError('Permissions are misconfigured');
 
 	if(permission.excluded !== undefined){
+		if(permission.excluded.length === 0)
+			return true;
+
 		const key = Object.keys(body).find( key => permission.excluded?.includes(key));
 
 		if(key !== undefined)
@@ -47,15 +67,31 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 	}
 
 	if(permission.included !== undefined){
-		if(checkAllIncluded(permission.included))
+		console.debug(permission.included);
+
+		if(permission.included.length === 0)
+			throw new createError.Forbidden('Property update is not authorized');
+		
+		if(checkAllIncluded(permission.included) 
+			&& permission.included.length === relations + 1)
 			return true;
 
-		const key = Object.keys(body).find( key => !permission.included?.includes(key));
+		const properties: string[] = Object.keys(body).reduce((prev: string[], curr: string) => {
+
+			if(typeof(body[curr as keyof object]) === 'object'){
+				return [...prev, ...Object.keys(body[curr as keyof object]).map(k => `${curr}.${k}`)];
+			}
+			else
+				prev.push(curr);
+			return prev;
+		}, []);
+		console.debug('properties');
+		console.debug(properties);
+
+		const key = Object.keys(properties).find( key => !permission.included?.includes(key));
 
 		if(key !== undefined)
 			throw new createError.Forbidden(`${key} update is not authorized`);
-
-		return true;
 	}
 
 	return true;

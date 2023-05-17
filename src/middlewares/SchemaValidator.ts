@@ -15,7 +15,9 @@ export default class SchemaValidator {
 	ajv: Ajv; 
 
 	constructor(schemas: AnySchema[]){
-		this.ajv = new Ajv({schemas: schemas, allErrors: true});
+		this.ajv = new Ajv({schemas: schemas, allErrors: true,
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			keywords:[require('ajv-keywords/dist/definitions/transform')()]});
 		addFormats(this.ajv);
 	}
 

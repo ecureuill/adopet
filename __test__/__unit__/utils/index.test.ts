@@ -1,6 +1,8 @@
+import { faker } from '@faker-js/faker/locale/pt_BR';
 import { Shelter } from '../../../src/entities/Shelter';
+import { IShelter } from '../../../src/types/schemas';
 import { assignProperties } from '../../../src/utils';
-import { generateShelterData } from '../../utils/generate';
+import { generatePetData, generateShelterData } from '../../utils/generate';
 
 describe('assignProperties function', () => {
 	const INITIAL_OBJECT = {
@@ -110,8 +112,65 @@ describe('assignProperties function', () => {
 
 		const body = generateShelterData();
 
-		const shelter = assignProperties(body, new Shelter());
+		const shelter: IShelter = {
+			id: body.id,
+			userId: body.userId,
+			inactive: !body.inactive,
+			pets: [],
+			user: {
+				id: body.userId,
+				email: faker.internet.email(),
+				password: faker.internet.password(),
+				city: faker.address.cityName(),
+				state: undefined,
+				phone: undefined,
+				role: body.user.role,
+				name: faker.name.fullName(),
+			}
+
+		};
+
+		assignProperties(body, shelter);
 
 		expect(shelter).toMatchObject(body as Shelter);
+	});
+
+	it('should add all attributes to shelter and keep older pets', () => {
+
+		const body = generateShelterData();
+		console.debug(body);
+
+		const shelter: IShelter = {
+			id: body.id,
+			userId: body.userId,
+			inactive: !body.inactive,
+			pets: [generatePetData()],
+			user: {
+				id: body.userId,
+				email: faker.internet.email(),
+				password: faker.internet.password(),
+				city: faker.address.cityName(),
+				state: undefined,
+				phone: undefined,
+				role: body.user.role,
+				name: faker.name.fullName(),
+			}
+
+		};
+
+		console.debug(shelter);
+
+		assignProperties(body, shelter);
+
+		const { pets: petsShelter, ...partialShelter} = shelter;
+		const { pets: petsBody, ...partialBody} = body;
+
+		expect(partialShelter).toEqual(partialBody);
+
+		petsBody.forEach(pet => {
+			expect(petsShelter).toContain(pet);
+		});
+		
+		expect(petsShelter.length-1).toEqual(petsBody.length);
 	});
 });

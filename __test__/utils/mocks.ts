@@ -1,12 +1,21 @@
 import { randomUUID } from 'crypto';
+import { Request, Response } from 'express';
 import { DataSource, TypeORMError } from 'typeorm';
 
-export const getMockResponse = () => {
+export const getMockResponse = (): Partial<Response> => {
 	return {
 		locals: {},
 		status: jest.fn().mockReturnThis(),
 		json: jest.fn().mockReturnThis(),
 		send: jest.fn().mockReturnThis()
+	};
+};
+
+export const getMockRequest = () : Partial<Request> => {
+	return {
+		params:{},
+		headers:{},
+		body:{}
 	};
 };
 

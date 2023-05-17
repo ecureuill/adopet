@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { handleTypeORMError } from '../../../../src/middlewares/error-handlers/handleTypeORMError';
 import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
 import { HttpError } from 'http-errors';
-import { getMockResponse } from '../../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../../utils/mocks';
 
 describe('TypeORM Error handler middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -10,7 +10,7 @@ describe('TypeORM Error handler middleware', () => {
 	const nextFunction: NextFunction = jest.fn();
 
 	beforeEach(() => {
-		mockRequest = {};
+		mockRequest = getMockRequest();
 		mockResponse = getMockResponse();
 	});
 

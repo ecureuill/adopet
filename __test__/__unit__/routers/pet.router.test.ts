@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import PetController from '../../../src/controller/pet.controller';
 import PetRouter from '../../../src/routers/pet.router';
 import { generatePetData, generatePetsData } from '../../utils/generate';
-import { getMockResponse } from '../../utils/mocks';
+import { getMockRequest, getMockResponse } from '../../utils/mocks';
 
 let mockRequest: Partial<Request>;
 let mockResponse: Partial<Response>;
@@ -11,30 +11,32 @@ let mockResponse: Partial<Response>;
 describe('Pet Router', () => {
 	let controller: any;
 
-	describe('getAll', () => {
+	beforeEach(() => {
+		mockRequest = getMockRequest();
+		mockResponse = getMockResponse();
+		mockResponse.locals = {
+			user: {
+				id: randomUUID(),
+				authenticated: true,
+				role: 'shelter',
+				permission: {
+					granted: true,
+					excluded: undefined,
+					included: ['*'],
+					ownershipRequired: false
+				}
+			}
+		};
+	});
 
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
+	afterEach(() => {
+		jest.restoreAllMocks();
+	});
+
+	describe('getAll', () => {
 
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'getAll');
-
-			mockRequest = {};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
-			};
 		});
 
 		it('should return 404 - Não encontrado', async () => {
@@ -73,37 +75,17 @@ describe('Pet Router', () => {
 	
 	describe('getOneById', () => {
 
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
-
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'getOneById');
 
-			mockRequest = {
-				params:{
-					id: randomUUID()
-				}
-			};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
+			mockRequest.params = {
+				id: randomUUID()
 			};
 		});
 
 		it('should return pet with status 200', async () => {
 
-			const result = generatePetData({id: mockRequest.params!.id});
+			const result = generatePetData({id: mockRequest.params?.id});
 
 			controller.mockResolvedValueOnce(result);
 
@@ -112,35 +94,15 @@ describe('Pet Router', () => {
 
 			expect(res.json).toHaveBeenCalledWith(result);
 			expect(res.status).toHaveBeenCalledWith(200);
-			expect(controller).toHaveBeenCalledWith(mockRequest.params!.id);
+			expect(controller).toHaveBeenCalledWith(mockRequest.params?.id);
 			expect(controller).toHaveBeenCalledTimes(1);
 		});
 	});
 	
 	describe('create', () => {
 
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
-
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'create');
-
-			mockRequest = {};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
-			};
 		});
 
 		it('should return 201', async () => {
@@ -161,32 +123,8 @@ describe('Pet Router', () => {
 	});
 	
 	describe('updateAll', () => {
-
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
-
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'updateAll');
-
-			mockRequest = {
-				params: {},
-				body: {}
-			};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
-			};
 		});
 
 		it('should return 201', async () => {
@@ -208,32 +146,8 @@ describe('Pet Router', () => {
 	});
 	
 	describe('updateSome', () => {
-
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
-
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'updateSome');
-
-			mockRequest = {
-				params: {},
-				body: {}
-			};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
-			};
 		});
 
 		it('should return 201', async () => {
@@ -254,38 +168,13 @@ describe('Pet Router', () => {
 		});
 	});
 	describe('getOneById', () => {
-
-		afterEach(() => {
-			jest.restoreAllMocks();
-		});
-
 		beforeEach(() => {
 			controller = jest.spyOn(PetController.prototype, 'delete');
-
-			mockRequest = {
-				params:{
-					id: randomUUID()
-				}
-			};
-			mockResponse = getMockResponse();
-			mockResponse.locals = {
-				user: {
-					id: randomUUID(),
-					authenticated: true,
-					role: 'shelter',
-					permission: {
-						granted: true,
-						excluded: undefined,
-						included: ['*'],
-						ownershipRequired: false
-					}
-				}
-			};
 		});
 
 		it('should return pet with status 200', async () => {
 
-			const result = generatePetData({id: mockRequest.params!.id});
+			const result = generatePetData({id: mockRequest.params?.id});
 
 			controller.mockResolvedValueOnce(result);
 
@@ -294,7 +183,7 @@ describe('Pet Router', () => {
 
 			expect(res.json).toHaveBeenCalledWith(result);
 			expect(res.status).toHaveBeenCalledWith(200);
-			expect(controller).toHaveBeenCalledWith(mockRequest.params!.id);
+			expect(controller).toHaveBeenCalledWith(mockRequest.params?.id);
 			expect(controller).toHaveBeenCalledTimes(1);
 		});
 	});
