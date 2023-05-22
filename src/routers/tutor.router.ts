@@ -9,7 +9,7 @@ export default class TutorRouter {
 		const result = await controller.getAll();
 
 		if(result.count === 0)
-			return response.status(404).json({mensagem: 'Não encontrado'});
+			return response.status(200).json({mensagem: 'Não encontrado'});
 
 		return response.status(200).json(result);
 	}

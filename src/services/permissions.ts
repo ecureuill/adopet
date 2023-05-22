@@ -15,6 +15,18 @@ const shelterSensitiveColumns = [
 	'id', 'userId'
 ] as const;
 
+const tutorSensitiveColumns = [
+	'id', 'userId'
+] as const;
+
+const autoColumns = [
+	'create_date', 'update_date', 'delete_date'
+] as const;
+
+const getAutoColumns = (alias: string) => {
+	return autoColumns.map( col => `${alias}.${col}`);
+};
+
 const getUserSensitiveColumns = (alias?: string) => {
 	if(alias === undefined)
 		return userSensitiveColumns;
@@ -36,6 +48,13 @@ const getShelterSensitiveColumns = (alias?: string) => {
 		return shelterSensitiveColumns.map( col => `${alias}.${col}`);
 };
 
+const getTutorSensitiveColumns = (alias?: string) => {
+	if(alias === undefined)
+		return tutorSensitiveColumns;
+	else
+		return tutorSensitiveColumns.map( col => `${alias}.${col}`);
+};
+
 const petPermission: IRule = {
 	resource: Resources.PET,
 	permissions: [
@@ -44,7 +63,7 @@ const petPermission: IRule = {
 			roles: [Role.ADMIN],
 			ownership: false,
 			attributes: {
-				included: ['*', 'user.*', 'pets.*']
+				included: ['*', 'pets.*']
 			}
 		},
 		{
@@ -65,7 +84,7 @@ const petPermission: IRule = {
 			roles: [Role.SHELTER],
 			ownership: true,
 			attributes: {
-				excluded: ['adopted', ...getPetSensitiveColumns()]
+				excluded: ['adopted', ...getPetSensitiveColumns(), ...autoColumns]
 			}
 		},
 		{
@@ -84,7 +103,7 @@ const tutorPermission: IRule = {
 			roles: [Role.ADMIN],
 			ownership: false,
 			attributes: {
-				included: ['*', 'user.*', 'pets.*']
+				excluded: []
 			}
 		},
 		{
@@ -97,7 +116,7 @@ const tutorPermission: IRule = {
 			roles: [Role.TUTOR],
 			ownership: true,
 			attributes: {
-				included: ['*', 'user.*', 'pets.*']// excluded: [...getShelterSensitiveColumns(), ...getUserSensitiveColumns('user')]
+				excluded: [...getTutorSensitiveColumns(), ...getUserSensitiveColumns('user')]
 			}
 		},
 		{
@@ -105,7 +124,7 @@ const tutorPermission: IRule = {
 			roles: [Role.TUTOR],
 			ownership: true,
 			attributes: {
-				excluded: [...getShelterSensitiveColumns(), ...getUserSensitiveColumns('user')]
+				excluded: [...getTutorSensitiveColumns(), ...getUserSensitiveColumns('user')]
 			}
 		}
 	]
@@ -140,7 +159,7 @@ const shelterPermission: IRule = {
 			roles: [Role.SHELTER],
 			ownership: true,
 			attributes: {
-				excluded: [...getShelterSensitiveColumns(), ...getPetSensitiveColumns('pets'), ...getUserSensitiveColumns('user')]
+				excluded: [...getShelterSensitiveColumns(), ...getPetSensitiveColumns('pets'), ...getUserSensitiveColumns('user'), ...autoColumns, ...getAutoColumns('pets'), ...getAutoColumns('user')]
 			}
 		},
 		{
@@ -157,7 +176,10 @@ const userPermission: IRule = {
 		{
 			action: Actions.ALL,
 			roles: [Role.ADMIN],
-			ownership: false
+			ownership: false,
+			attributes: {
+				excluded: []
+			}
 		},
 		{
 			action: Actions.READ,
@@ -172,7 +194,7 @@ const userPermission: IRule = {
 			roles: [Role.SHELTER, Role.TUTOR],
 			ownership: true,
 			attributes: {
-				excluded: [ ...getUserSensitiveColumns()]
+				excluded: [ ...getUserSensitiveColumns(), ...autoColumns]
 			}
 		}
 	]
@@ -181,7 +203,7 @@ const userPermission: IRule = {
 export const permissions = {pet: petPermission, tutor: tutorPermission, shelter: shelterPermission, user: userPermission};
 
 export const getPermission = (resource: Resource) => {
-	console.debug(`getPermission for ${resource}`);
+	// console.(`getPermission for ${resource}`);
 
 	switch (resource){
 	case 'pet':
@@ -200,8 +222,6 @@ export const getPermission = (resource: Resource) => {
 export const checkGrant = (permission: IActionPermission, role?: Role) => {
 	let hasRequiredRole = false;
 
-	console.debug(`Check roles ${permission.roles}`);
-	console.debug(`User role ${role}`);
 	if(typeof(permission.roles) !== 'string' && role !== undefined)
 	{
 		hasRequiredRole = permission.roles.some((r: Role) => r === role);
@@ -227,7 +247,6 @@ export const checkAllIncluded = (included: string[]) => {
 };
 
 export const isPropertiesPermissionMisconfigured = ({excluded, included}: any) => {
-
 	if(excluded === undefined && included === undefined) 
 		return true;
 

@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 import { ITutor } from '../types/schemas';
 
@@ -20,6 +20,9 @@ export class Tutor extends BaseEntity implements ITutor {
 
 	@Column('uuid')
 	userId: string;
+
+	@DeleteDateColumn()
+	delete_date: string;
 
 	constructor();
 	constructor(tutor: Tutor);

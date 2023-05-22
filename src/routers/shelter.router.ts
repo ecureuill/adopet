@@ -8,7 +8,7 @@ export default class ShelterRouter {
 		const result = await controller.getAll();
 
 		if(result.count === 0)
-			return response.status(404).json({mensagem: 'Não encontrado'});
+			return response.status(200).json({mensagem: 'Não encontrado'});
 
 		return response.status(200).json(result);
 	}
@@ -16,7 +16,6 @@ export default class ShelterRouter {
 	async getOneById(request: Request, response: Response){
 		const controller = new ShelterController(response.locals.user);
 
-		console.debug(request.params);
 		const { id } = request.params;
 
 		const result = await controller.getOneById(id);

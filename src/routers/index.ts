@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import TutorRouter from './tutor.router';
 import ShelterRouter from './shelter.router';
 import PetRouter from './pet.router';
@@ -33,6 +33,7 @@ router.get('/ping/', (request: Request, response: Response) => {
 });
 
 router.post('/login',
+	validator.validate({schema: 'loginSchema', data: 'body'}),
 	asyncHandler(userRouter.auth)
 );
 
@@ -51,7 +52,11 @@ router.post('/signup/abrigos/',
 	asyncHandler(shelterRouter.create)
 );
 
-router.all('*',
+router.all('*', 
+	(request: Request, response: Response, next: NextFunction) => {
+		console.debug(request.params);
+		next();
+	},
 	JWTVerify,
 );
 

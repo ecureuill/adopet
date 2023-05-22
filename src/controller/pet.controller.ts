@@ -62,4 +62,21 @@ export default class PetController extends Controller<Pet> {
 
 		return super.updateAll(entity, id);
 	}
+
+	async updateSome(body: any, id: string){
+		
+		const pet = await Pet.findOneByOrFail({id : id});
+
+		if(body.id !== undefined)
+			idReplacememtIsNotAllowed(body.id, id);
+		
+		if(body.shelterId !== undefined)
+			idReplacememtIsNotAllowed(body.shelterId, pet.shelterId);
+
+		return super.updateSome(body, id);
+	}
+
+	async delete(id: string, softdelete?: boolean) {
+		return await super.delete(id, true);
+	}
 } 

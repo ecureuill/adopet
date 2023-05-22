@@ -21,27 +21,21 @@ export default class UserRouter {
 	}
 
 	async getAll(request: Request, response: Response){
-		console.debug('UserRouter');
 		
 		const controller = new UserController(response.locals.user);
 		
 		const result = await controller.getAll();
 
 		if(result.count === 0)
-			return response.status(404).json({mensagem: 'Não encontrado'});
+			return response.status(200).json({mensagem: 'Não encontrado'});
 
 		return response.status(200).json(result);
 	}
 
 	async getOneById(request: Request, response: Response){
 
-		console.debug('response.locals');
-		console.debug(response.locals);
-
 		const controller = new UserController(response.locals.user);
 
-
-		console.debug(request.params);
 		const { id } = request.params;
 
 		const result = await controller.getOneById(id);

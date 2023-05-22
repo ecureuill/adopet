@@ -6,6 +6,8 @@ import { createJwtToken } from '../services/tokens';
 import { Role } from '../types/enums';
 import { IUserSettings } from '../types/interfaces';
 import Controller from '.';
+import createHttpError from 'http-errors';
+import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
 export default class UserController extends Controller<User> {
 	private static alias = 'user';
@@ -23,11 +25,21 @@ export default class UserController extends Controller<User> {
 	}
 
 	async auth(email: string, password: string){
+		let entity;
 
-		const entity = await User.findOneByOrFail({
-			email: email,
-		});
-
+		try{
+			entity = await User.findOneByOrFail({
+				email: email,
+			});
+		}
+		catch (err){
+			console.error(err);
+			if(err instanceof EntityNotFoundError)
+				throw new createError.Unauthorized('Invalid credentials');
+			
+			throw err;
+		}
+		
 		if(!passwordCompareHash(password, entity.password))
 			throw new createError.Unauthorized('Invalid credentials');
 
@@ -36,15 +48,17 @@ export default class UserController extends Controller<User> {
 
 	async create(user: User, role: Role = Role.ADMIN) {
 		user.password = passwordToHash(user.password);
-		console.debug(user.role);
 		user.role = role; 
 		
-		console.debug(user.role);
-		
 		const repository = dataSource.getRepository(User);
-		await repository.save(user);
-
-		console.debug(`Saved a new user with id ${user.id}`);
+		try{
+			await repository.save(user);
+		}
+		catch (err){
+			if(err instanceof QueryFailedError && err.message.startsWith('duplicate key value violates unique constraint'))
+				throw new createHttpError.BadRequest('Email already exist');
+			throw err;
+		}
 
 		return user;
 	}

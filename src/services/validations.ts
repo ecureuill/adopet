@@ -15,8 +15,6 @@ export const idReplacememtIsNotAllowed = (bodyId: string | undefined, paramId: s
 };
 
 export const isOwnerOrFail = (ownerId: string, id: string) => {
-	console.debug('isOwnerOrFail');
-
 	if(ownerId !== id)
 		throw createError.Forbidden('Only owner is authorized to perform this action');
 
@@ -49,16 +47,18 @@ export const isPutAllowedOrFail = ({ permission }: IUserSettings, relations: num
 };
 
 export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUserSettings, relations: number) => {
-	console.debug(body);
 
 	if(isPropertiesPermissionMisconfigured(permission))
 		throw new createError.InternalServerError('Permissions are misconfigured');
+
+	const payload: string[] = flatPayloadKeys(body);
 
 	if(permission.excluded !== undefined){
 		if(permission.excluded.length === 0)
 			return true;
 
-		const key = Object.keys(body).find( key => permission.excluded?.includes(key));
+		const key = payload.find( key => permission.excluded?.includes(key));
+		
 
 		if(key !== undefined)
 			throw new createError.Forbidden(`${key} update is not authorized`);
@@ -67,7 +67,6 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 	}
 
 	if(permission.included !== undefined){
-		console.debug(permission.included);
 
 		if(permission.included.length === 0)
 			throw new createError.Forbidden('Property update is not authorized');
@@ -76,19 +75,7 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 			&& permission.included.length === relations + 1)
 			return true;
 
-		const properties: string[] = Object.keys(body).reduce((prev: string[], curr: string) => {
-
-			if(typeof(body[curr as keyof object]) === 'object'){
-				return [...prev, ...Object.keys(body[curr as keyof object]).map(k => `${curr}.${k}`)];
-			}
-			else
-				prev.push(curr);
-			return prev;
-		}, []);
-		console.debug('properties');
-		console.debug(properties);
-
-		const key = Object.keys(properties).find( key => !permission.included?.includes(key));
+		const key = payload.find( key => !permission.included?.includes(key));
 
 		if(key !== undefined)
 			throw new createError.Forbidden(`${key} update is not authorized`);
@@ -99,11 +86,30 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 
 
 export const checkPetOwner = async (pet: Pet, userId: string) => {
-	console.debug('checkPetOwner');
 	const shelter = await Shelter.findOneBy({id: pet.shelterId});
 
 	if(shelter === null)
 		throw new createHttpError.BadRequest('Shelter does not exist');
 		
 	return isOwnerOrFail(shelter.userId, userId);
+};
+
+const flatPayloadKeys = (obj: any) : string[] => {
+	return Object.keys(obj).reduce((prev: string[], curr: string) => {
+		if(typeof obj[curr as keyof object] === 'object' && obj[curr as keyof object] !== null){
+			if(Array.isArray(obj[curr as keyof object]))
+			{
+				let arrayObj = (obj[curr as keyof object] as []).reduce( (prev: string[], curr: string) => flatPayloadKeys(curr), []);
+
+				if(arrayObj.length > 1)
+					arrayObj = arrayObj.filter( k => k !== 'id'); //ignore id, because oit is necessary to patch the correct item of array
+				return [...prev, ...arrayObj.map(k => `${curr}.${k}`)];
+			}
+			else
+				return [...prev, ...Object.keys(obj[curr as keyof object]).map(k => `${curr}.${k}`)];
+		}
+		else
+			prev.push(curr);
+		return prev;
+	}, []);
 };

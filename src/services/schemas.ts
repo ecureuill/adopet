@@ -60,6 +60,18 @@ export const paramSchema = {
 	}
 };
 
+const loginSchema = {
+	$id: 'loginSchema',
+	type: 'object',
+	required: ['email', 'password'],
+	properties: {
+		email: {$ref: 'definitionsSchema#/definitions/email'},
+		password: {$ref: 'definitionsSchema#/definitions/password'},
+	},
+	additionalProperties: false,
+	minProperties: 2,
+};
+
 const userSchema: JSONSchemaType<IUser> = {
 	$id: 'userSchema',
 	type: 'object',
@@ -161,6 +173,6 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 	minProperties: 1 //avoid empty body on
 };
 
-const schemas = [definitionsSchema, userSchema, petSchema, tutorSchema, shelterSchema, paramSchema];
+const schemas = [definitionsSchema, loginSchema, userSchema, petSchema, tutorSchema, shelterSchema, paramSchema];
 
 export default schemas;
