@@ -203,8 +203,6 @@ const userPermission: IRule = {
 export const permissions = {pet: petPermission, tutor: tutorPermission, shelter: shelterPermission, user: userPermission};
 
 export const getPermission = (resource: Resource) => {
-	// console.(`getPermission for ${resource}`);
-
 	switch (resource){
 	case 'pet':
 		return petPermission.permissions;

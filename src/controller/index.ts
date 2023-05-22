@@ -132,7 +132,6 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		else 
 		{
 			const selectOpt = this.getSelection();
-			console.debug(selectOpt);
 			
 			if(selectOpt.length === 0)
 				qb.select();
@@ -142,7 +141,6 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		}
 
 		if(this._joinQuery !== undefined){
-			console.debug(this._joinQuery);
 
 			if(selectAllRelations)
 				this._joinQuery.forEach(join => qb.leftJoinAndSelect(join.property, join.alias, join.condition, join.parametes));
@@ -163,12 +161,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 
 		qb.where(whereOpt);
 
-		console.debug('Loading all entities from database');
-		console.debug(qb.getSql());
 		const [entities, count] = await qb.getManyAndCount();
-
-		console.debug(entities);
-		console.debug(`count ${count}`);
 
 		return { count, entities };
 	}
@@ -177,14 +170,11 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		const qb = this.getQueryBuilder()
 			.where({[this._idColumnName] : id});
 
-		console.debug('Loading entity from database');
-		console.debug(qb.getSql());
 		const entity = await qb.getOneOrFail();
 
 		if(this._userSettings.permission.ownershipRequired)
 			await this._fnIsOwnerOrFail(entity, this._userSettings.id);
 		
-		console.debug(entity);
 		return entity;
 	}
 
@@ -195,8 +185,6 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		isPutAllowedOrFail({ permission: this._userSettings.permission } as IUserSettings, this._joinQuery.length);
 
 		idReplacememtIsNotAllowed(entity[this._idColumnName], id);
-		
-		console.debug(`update user ${entity[this._idColumnName]}`);
 
 		return await this.repository.save(entity);
 	}
@@ -212,14 +200,8 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		idReplacememtIsNotAllowed((body as TEntity).id, id);
 
 		isPropertyUpdateAllowedOrFail(body, {permission: this._userSettings.permission} as IUserSettings, this._joinQuery.length);
-	
-		console.debug(entity);
 
 		entity = assignProperties(body, entity);
-
-		console.debug(entity);
-	
-		console.debug(`update entity ${entity[this._idColumnName]}`);
 
 		return await this.repository.save(entity);
 	}
@@ -230,15 +212,13 @@ export default class Controller<TEntity extends ObjectLiteral> {
 			.where({[this._idColumnName] : id})
 			.getOneOrFail();
 
-		console.debug(entity);
 
 		if(this._userSettings.permission.ownershipRequired)
 			await this._fnIsOwnerOrFail(entity, this._userSettings.id);
 		
-		if(softdelete){
-			console.debug('attempt to soft-delete');
+		if(softdelete)
 			return await this.repository.softRemove(entity);
-		}
+		
 		else
 			return await this.repository.remove(entity);
 	}

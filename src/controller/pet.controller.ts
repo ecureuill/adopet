@@ -5,9 +5,6 @@ import { Shelter } from '../entities/Shelter';
 import { checkPetOwner, idReplacememtIsNotAllowed } from '../services/validations';
 import { IUserSettings } from '../types/interfaces';
 
-
-
-
 export default class PetController extends Controller<Pet> {
 
 	constructor(userSettings: IUserSettings){
@@ -32,18 +29,12 @@ export default class PetController extends Controller<Pet> {
 	}
 
 	async create(pet: Pet){
-		console.debug('create');
 		if(this.getOwnerRequired()){
-			console.debug('ownershipRequired');
-
 			const result = await checkPetOwner(pet, this.getUserId());
-			console.log(result);
 		}
 
 		const repository = dataSource.getRepository(Pet);
 		await repository.save(pet);
-
-		console.debug(`Saved a new pet with id ${pet.id}`);
 
 		return pet;
 	}

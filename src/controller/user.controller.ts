@@ -33,7 +33,6 @@ export default class UserController extends Controller<User> {
 			});
 		}
 		catch (err){
-			console.error(err);
 			if(err instanceof EntityNotFoundError)
 				throw new createError.Unauthorized('Invalid credentials');
 			

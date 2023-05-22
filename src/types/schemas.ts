@@ -9,7 +9,7 @@ export interface IUser {
 	phone?: string;
 	city?: string;
 	state?: string;
-	delete_date?: string;
+	delete_date?: string | null;
 }
 
 export interface IPet {
@@ -20,11 +20,11 @@ export interface IPet {
 	size_variety: 'xxs'| 'xs'| 's'| 'm'| 'l'| 'xl';
 	type: 'dog' | 'cat';
 	adopted: boolean;
-	photo?: string | Buffer;
+	photo?: string | Buffer | null;
 	shelterId: `${string}-${string}-${string}-${string}-${string}` | string;
-	delete_date?: string;
-	create_date?: string;
-	update_date?: string;
+	delete_date?: string | null;
+	create_date?: string | null;
+	update_date?: string | null;
 }
 
 export interface ITutor {
@@ -33,7 +33,7 @@ export interface ITutor {
 	photo?: string | Buffer,
 	about?: string,
 	user: IUser
-	delete_date?: string;
+	delete_date?: string | null;
 }
 
 export interface IShelter {
@@ -42,5 +42,5 @@ export interface IShelter {
 	inactive: boolean,
 	pets: Array<IPet>,
 	user: IUser
-	delete_date?: string;
+	delete_date?: string | null;
 }

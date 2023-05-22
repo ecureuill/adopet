@@ -33,8 +33,6 @@ export const getSelectableColumns = <Entity extends ObjectLiteral>(repository: R
 	
 	let selectOpt: string[] = [];
 	
-	console.debug('queryBuilder');
-
 	if(isPropertiesPermissionMisconfigured({excluded: columnsToExclude, included: columnsToInclude}))
 		throw new createHttpError.InternalServerError('Permissions are misconfigured');
 
@@ -58,8 +56,6 @@ export const getSelectableColumns = <Entity extends ObjectLiteral>(repository: R
 
 	}
 	
-	console.debug(selectOpt);
-
 	return selectOpt;
 };
 
