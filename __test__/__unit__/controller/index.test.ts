@@ -1,13 +1,11 @@
-import { closeConnection, openConnection } from '../../../src/database/datasource/data-source';
-import Controller, { settings } from '../../../src/controller';
-import { User } from '../../../src/entities/User';
 import { randomUUID } from 'crypto';
+import { EntityNotFoundError, EntityPropertyNotFoundError, SelectQueryBuilder, TypeORMError } from 'typeorm';
+import Controller, { settings } from '../../../src/controller';
+import { closeConnection, openConnection } from '../../../src/database/datasource/data-source';
+import { User } from '../../../src/entities/User';
 import { Role } from '../../../src/types/enums';
-import { EntityNotFoundError, EntityPropertyNotFoundError, Repository, SelectQueryBuilder, TypeORMError } from 'typeorm';
 import { generateUserData, generateUsersData } from '../../utils/generate';
-import createHttpError from 'http-errors';
 import { getMockRepository } from '../../utils/mocks';
-import { IUser } from '../../../src/types/schemas';
 
 describe('Generic Controller', () => {
 	let settings: settings;

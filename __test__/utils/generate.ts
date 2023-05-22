@@ -19,18 +19,27 @@ export const generateToken = (override: {id?: string, role?: Role} = {}) => {
 	});
 };
 
-export const generateUserData = (overide = {}): IUser => {
+export const generateUserData = (overide = {}, includeSensitive = true): IUser => {
+	if(includeSensitive)
+		return {
+			id: randomUUID(),
+			name: faker.name.fullName(),
+			email: faker.internet.email(),
+			password: faker.internet.password(),
+			city: faker.address.city(),
+			state: faker.address.stateAbbr(),
+			phone: faker.phone.number('## #####-####'),
+			role: getRandomEnum(Role),
+			...overide,
+		};
 	return {
-		id: randomUUID(),
 		name: faker.name.fullName(),
 		email: faker.internet.email(),
-		password: faker.internet.password(),
 		city: faker.address.city(),
 		state: faker.address.stateAbbr(),
-		phone: faker.phone.number('## #.####-####'),
-		role: getRandomEnum(Role),
+		phone: faker.phone.number('## #####-####'),
 		...overide,
-	};
+	} as IUser;
 };
 
 export const generateUsersData = (n = 1, overide = {}): IUser[] => {
@@ -39,29 +48,46 @@ export const generateUsersData = (n = 1, overide = {}): IUser[] => {
 	});
 };
 
-export const generatePetData = (overide = {}): IPet => {
+export const generatePetData = (overide = {}, includeSensitive = true): IPet => {
+	console.debug(`generatePetData ${includeSensitive}`)
+
+	if(includeSensitive)
+		return {
+			id: randomUUID(),
+			shelterId: randomUUID(),
+			photo: faker.image.animals(),
+			adopted: faker.datatype.boolean(),
+			age: faker.datatype.number(),
+			age_unit: getRandomEnum(AgeUnit),
+			size_variety: getRandomEnum(SizeVariety),
+			type: getRandomEnum(PetType),
+			name: faker.name.firstName(),
+			...overide,
+		};
 	return {
-		id: randomUUID(),
-		shelterId: randomUUID(),
 		photo: faker.image.animals(),
 		adopted: faker.datatype.boolean(),
-		age: faker.datatype.number({min: 1, max: 20}),
+		age: faker.datatype.number(),
 		age_unit: getRandomEnum(AgeUnit),
 		size_variety: getRandomEnum(SizeVariety),
 		type: getRandomEnum(PetType),
 		name: faker.name.firstName(),
 		...overide,
-	};
+	} as IPet;
+
 };
 
-export const generatePetsData = (n = 1, overide = {}): IPet[] => {
+export const generatePetsData = (n = 1, overide = {}, includeSensitive = true): IPet[] => {
 	return Array.from({length: n},(_, i) => {
-		return generatePetData(overide);
+		return generatePetData(overide, includeSensitive);
 	});
 };
 
-export const generateTutorData = (overide = {}): ITutor => {
-	const user = generateUserData();
+export const generateTutorData = (overide: {
+	tutor?: Partial<ITutor>,
+	user?: Partial<IUser>,
+} = {tutor: {}, user: {}}): ITutor => {
+	const user = generateUserData({role: 'tutor', ...overide.user});
 
 	return {
 		user: user,
@@ -69,31 +95,51 @@ export const generateTutorData = (overide = {}): ITutor => {
 		userId: user.id,
 		about: faker.lorem.paragraph(),
 		photo: faker.image.people(),
-		...overide,
+		...overide.tutor,
 	};
 };
 
-export const generateTutorsData = (n = 1, overide = {}): ITutor[] => {
+export const generateTutorsData = (n = 1, overide: {
+	tutor?: Partial<ITutor>,
+	user?: Partial<IUser>,
+} = {tutor: {}, user: {}}): ITutor[] => {
 	return Array.from({length: n},(_, i) => {
 		return generateTutorData(overide);
 	});
 };
 
-export const generateShelterData = (overide = {}): IShelter => {
-	const user = generateUserData();
+export const generateShelterData = (overide: {
+	shelter?: Partial<IShelter>,
+	user?: Partial<IUser>,
+	pet?: Partial<IPet>,
+} = {shelter: {}, user: {}, pet: {}}, includeSensitive = true, petNumber: number = faker.datatype.number({min: 0, max: 5})): IShelter => {
+
+	const user = generateUserData({role: 'shelter', ...overide.user}, includeSensitive);
 	const id = randomUUID();
+	
+	if(includeSensitive)
+		return {
+			user: user,
+			id: id,
+			userId: user.id,
+			inactive: faker.datatype.boolean(),
+			pets: generatePetsData(petNumber, { shelterId: id, ...overide.pet}, includeSensitive),
+			...overide.shelter,
+		};
 
 	return {
 		user: user,
-		id: id,
-		userId: user.id,
 		inactive: faker.datatype.boolean(),
-		pets: generatePetsData(faker.datatype.number({min: 0, max: 5}), { shelterId: id}),
+		pets: generatePetsData(petNumber, {},includeSensitive),
 		...overide,
-	};
+	} as IShelter;
 };
 
-export const generateSheltersData = (n = 1, overide = {}): IShelter[] => {
+export const generateSheltersData = (n = 1, overide: {
+	shelter?: Partial<IShelter>,
+	user?: Partial<IUser>,
+	pet?: Partial<IPet>,
+} = {shelter: {}, user: {}, pet: {}}): IShelter[] => {
 	return Array.from({length: n},(_, i) => {
 		return generateShelterData(overide);
 	});
