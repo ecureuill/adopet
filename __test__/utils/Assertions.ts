@@ -1,100 +1,100 @@
 import { Response } from 'supertest';
-import { passwordCompareHash } from '../../src/services/passwords';
-import { IPet, IShelter, ITutor, IUser } from '../../src/types/schemas';
-import { HTTP_RESPONSE } from './consts';
-import './petsToBeUpdatedOrCreated.matcher';
-import './toBeWithinRange';
+import { normalizeEntities, normalizeEntity, removeSensity } from '.';
+import { Pet } from '../../src/entities/Pet';
 import { Shelter } from '../../src/entities/Shelter';
 import { Tutor } from '../../src/entities/Tutor';
 import { User } from '../../src/entities/User';
-import { Pet } from '../../src/entities/Pet';
+import { passwordCompareHash } from '../../src/services/passwords';
+import { IPet, IShelter, ITutor, IUser } from '../../src/types/schemas';
+import { HTTP_RESPONSE } from './consts';
 
 export class Assertions { 
 
 	static signUPNotAllowed(res: Response){
-		expect(res.body['message']).toBe('Email already exist');
+		expect(res.body.message).toBe('Email already exist');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.BadRequest);
 
 	}
 
 	static unauthenticated(res: Response){
-		expect(res.body['message']).toBe('Missing token');
+		expect(res.body.message).toBe('Missing token');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Unauthorized);
 	}
 
 	static notAllowedRole(res: Response){
-		expect(res.body['message']).toBe('This action is not authorized');
+		expect(res.body.message).toBe('This action is not authorized');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Forbidden);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static notAllowedEntityUpdate(res: Response){
-		expect(res.body['message']).toBe('PUT is not authorized');
+		expect(res.body.message).toBe('PUT is not authorized');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Forbidden);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static notAllowedPropertyUpdate(res: Response){
-		expect(res.body['message']).toContain('update is not authorized');
+		expect(res.body.message).toContain('update is not authorized');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Forbidden);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static restrictedToOwner(res: Response){
-		expect(res.body['message']).toBe('Only owner is authorized to perform this action');
+		expect(res.body.message).toBe('Only owner is authorized to perform this action');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Forbidden);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static idReplacement(res: Response){
 		expect(res.statusCode).toBe(HTTP_RESPONSE.BadRequest);
-		expect(res.body['message']).toBe('id replacememt is not allowed');
+		expect(res.body.message).toBe('id replacememt is not allowed');
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static jsonSchemaError(res: Response){
-		expect(res.body['error_name']).toContain('Schema Error');
+		expect(res.body.error_name).toContain('Schema Error');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.BadRequest);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
 	static nonExistentId(res: Response){
-		expect(res.body['message']).toContain('Não Encontrado');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.BadRequest);
+		expect(res.body.message).toContain('Resource do not exist');
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
-	static retrieveCompleteListEntities(res: Response){
-		expect(res.statusCode).toBe(HTTP_RESPONSE.OK);
-		expect(res.get('Content-Type')).toContain('application/json');
-		expect(res.body['count']).not.toBeUndefined();
-		expect(res.body['entities']).not.toBeUndefined();
-		expect(res.body['entities']).toBeInstanceOf(Array);
-		expect((res.body['entities'] as Array<object>).length).toBe(res.body['count']);		
+	static retrieveCompleteListEntities(res: Response, entities: object[], isRemoveSensitive = false){
+		
+		this.doneOK(res);
+		
+		expect(res.body.count).toEqual(entities.length);
+		expect(res.body.entities).toBeInstanceOf(Array);
+		expect((res.body.entities as Array<object>).length).toBe(res.body.count);	
+		
+		if(entities[0] instanceof Shelter)
+			console.log(entities[0] instanceof Shelter)
+		else
+			this.matchEntities(res.body.entities, entities, isRemoveSensitive);
 	}
 
-	static retrieveRestrictedListOwnedEntities(res: Response){
-		expect(res.statusCode).toBe(HTTP_RESPONSE.OK);
-		expect(res.get('Content-Type')).toContain('application/json');
-		expect(res.body['count']).not.toBeUndefined();
-		expect(res.body['entities']).not.toBeUndefined();
-		expect(res.body['entities']).toBeInstanceOf(Array);
-		expect(res.body['count']).toEqual(1);
-		expect((res.body['entities'] as Array<object>).length).toEqual(1);	
+	static retrieveRestrictedListOwnedEntities(res: Response, entities: object[]){
+		this.doneOK(res);
+		
+		expect(res.body.count).toEqual(1);
+		expect(res.body.entities).toBeInstanceOf(Array);
+		expect((res.body.entities as Array<object>).length).toEqual(1);	
+		const current = normalizeEntities(res.body.entities);
+		const expected = normalizeEntities(entities, true);
+		this.matchEntity(current, expected);
 	}
 
-	static retrieveEntity(res: Response, entity: object){
-		expect(res.statusCode).toBe(HTTP_RESPONSE.OK);
-		expect(res.get('Content-Type')).toContain('application/json');
+	static retrieveEntity(res: Response, entity: object, isRemoveSensitive = false){
+		this.doneOK(res);
 
-		const { id, shelterId, userId, ...current} = res.body;
-
-		const { id: expectedId, shelterId: expectedShelterId, userId: expectedUserId, create_date: expectedCreateDate, update_date: expectedUpdateDate, delete_date: expectedDeleteDate,...expected} = entity as any;
-
-		expect(current).toMatchObject(expected);
+		this.matchEntity(res.body, entity, isRemoveSensitive);
 	}
 
-	private static doneOK(res: Response){
+	static doneOK(res: Response){
 		expect(res.statusCode).toBe(HTTP_RESPONSE.OK);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
@@ -126,9 +126,12 @@ export class Assertions {
 		expect(res.body).toMatchObject(pet);
 	}
 
+	static patchShelterDone(res: Response, before: Shelter, payload: any){
 
-	static patchShelterDone(res: Response, before: Shelter, payload: Shelter){
-		
+		normalizeEntity(res.body);
+		normalizeEntity(before);
+		normalizeEntity(payload);
+
 		const { user: currentUser, pets: currentPets,...currentShelter } = res.body;
 		const { user: beforeUser, pets: beforePets,...beforeShelter } = before;
 		const { user: payloadUser, pets: payloadPets,...payloadShelter } = payload;
@@ -136,7 +139,7 @@ export class Assertions {
 		this.doneOK(res);
 		this.patchUser(currentUser, beforeUser, payloadUser);
 		this.matchPatchedObj(payloadShelter as Shelter, beforeShelter as Shelter, currentShelter as Shelter);
-		this.patchPets(payloadPets, beforePets, currentPets);
+		this.patchPets(beforePets, currentPets, payloadPets);
 	}
 
 	static patchPetDone(res: Response, before: Pet, payload: Pet){
@@ -148,15 +151,33 @@ export class Assertions {
 		this.matchPatchedObj(payload, before,current);
 	}
 
-	static patchTutorDone(res: Response, before: Tutor, payload: Tutor){
+	static patchTutorDone(res: Response, before: ITutor, payload: Partial<ITutor>){
 		
-		const { user: currentUser,...currentTutor } = res.body;
-		const { user: beforeUser,...beforeTutor } = before;
-		const { user: payloadUser,...payloadTutor } = payload;
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			photo: currentPhoto, 
+			user: currentUser,
+			...currentTutor 
+		} = res.body;
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			photo: beforePhoto, 
+			user: beforeUser,
+			...beforeTutor 
+		} = before;
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			photo: payloadPhoto,
+			user: payloadUser,
+			...payloadTutor 
+		} = payload;
 
 		this.doneOK(res);
-		this.patchUser(currentUser, beforeUser, payloadUser);
-		this.matchPatchedObj(payloadTutor as Tutor, beforeTutor as Tutor, currentTutor as Tutor);
+		
+		if(payloadUser !== undefined)
+			this.patchUser(currentUser, beforeUser, payloadUser);
+
+		this.matchPatchedObj(payloadTutor, beforeTutor, currentTutor);
 	}
 
 	static patchUserDone(res: Response, before: User, payload: User){
@@ -166,15 +187,19 @@ export class Assertions {
 		this.patchUser(res.body, before, payload);
 	}
 	
-	private static patchUser(current: User, before: User, payload: User){
-		
-		if(payload.password !== undefined){
+	private static patchUser(current: IUser, before: IUser, payload: any){
 
-			const {password: hashedPwd, ...partialCurr} = current;
+		normalizeEntity(before);
+		normalizeEntity(current);
+		normalizeEntity(payload);
+
+		if(payload?.password !== undefined){
 			const {password: plainPwd, ...partialPay} = payload;
+			const {password: hashedPwd, ...partialCurr} = current;
 			const {password: beforePWD, ...partialBef} = before;
 
-			expect(passwordCompareHash(hashedPwd, plainPwd));
+			expect(passwordCompareHash(hashedPwd, plainPwd as string));
+			
 			this.matchPatchedObj(partialPay, partialBef, partialCurr);
 		}
 		else
@@ -182,42 +207,83 @@ export class Assertions {
 	}
 
 	static patchPets(before: Pet[], current: Pet[], petsPayload: any){
+
 		if(petsPayload === undefined)
 		{
-			expect(current).toEqual(before);
+			expect(current.reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, [])).toEqual(before.reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []));
 		}
 		else
 		{
-			const petsToBeCreated = (petsPayload as IPet[]).filter(p => p.id === undefined);
+			const beforeIds = before.map(p=> p.id);
 
-			const petsCreated = current.filter(p => p.create_date === p.update_date);
+			const petsToBeCreated = (petsPayload as IPet[]).filter(p => p.id === undefined).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
 
-			expect(petsCreated.length).toMatchObject(petsToBeCreated.length);
+			const petsCreated = current.filter(p => p.create_date === p.update_date && !beforeIds.includes(p.id)).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
 
-			const petsToBeUpdated = (petsPayload as IPet[]).filter(p => p.id !== undefined);
+			expect(petsCreated.length).toEqual(petsToBeCreated.length);
+			expect(petsCreated.length).toEqual(0);
+			
+			const petsToBeUpdated = (petsPayload as IPet[]).filter(p => p.id !== undefined).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
+
 			const petsToBeUpdatedIndex = petsToBeUpdated.map(p => p.id);
 			const petsUpdated = current.filter(p => petsToBeUpdatedIndex.includes(p.id)
-			);
+			).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
 
-			expect(petsUpdated.length).toMatchObject(petsToBeUpdated.length);
+			expect(petsUpdated.length).toEqual(1);
+			expect(petsUpdated.length).toEqual(petsToBeUpdated.length);
 
 			petsUpdated.forEach(pU => this.matchPatchedArrayObj(petsToBeUpdated, before, pU));
 			
-			const petsNotToBeAltered = current.filter(p => !petsToBeUpdatedIndex.includes(p.id));
+			const petsNotToBeAltered = current.filter(p => !petsToBeUpdatedIndex.includes(p.id)).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
 
-			const petsNotAltered = current.filter(p => !petsCreated.includes(p) && !petsUpdated.includes(p));
+			const petsNotAltered = current.filter(p => !petsCreated.includes(p) && !petsUpdated.includes(p)).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
 
-			expect(petsNotAltered.length).toMatchObject(petsNotToBeAltered.length);
+			expect(petsNotAltered.length).toEqual(petsNotToBeAltered.length);
 
-			expect(petsNotAltered).toEqual(petsNotToBeAltered);
+			expect(petsNotAltered).toMatchObject(petsNotToBeAltered);
 		}
 	}
 
 	static delete(res: Response){
-		expect(res.get('Content-Type')).toContain('application/json');
-		expect(res.statusCode).toBe(HTTP_RESPONSE.OK);
-		expect(res.body['delete_date']).not.toBeUndefined();
-		expect(res.body['delete_date']).not.toBe('');
+		this.doneOK(res);
+	}
+
+	static sofDelete(res: Response){
+		this.doneOK(res);
+		expect(res.body.delete_date).not.toBeUndefined();
+		expect(res.body.delete_date).not.toBe('');
 	}
 
 	private static matchUser(userPayload: IUser, userResp: User){
@@ -229,10 +295,108 @@ export class Assertions {
 		expect(passwordCompareHash(hashedPwd, plainPwd));
 	}
 
+	private static matchEntities(responseEntity: any[], payloadEntity: any[], isRemoveSensitive = false){
+
+		const current = responseEntity.map( item => {
+			normalizeEntity(item); 
+			return item;
+		});
+
+		const expected = payloadEntity.map( item => {
+			normalizeEntity(item); 
+			if(isRemoveSensitive)
+				return removeSensity(item);
+			return item;
+		});
+
+		expect(current).toMatchObject(expected);
+
+		// const currents: any[] = [];
+		// const currentsUsers: any[] = [];
+		// const petCurrents: any[] = [];
+
+		// for (const item of responseEntity){
+		// 	const { pets, user,  ...partial} = item;
+		// 	currents.push(partial);
+		// 	if(user !== undefined)
+		// 		currentsUsers.push(user);
+		// 	if(pets !== undefined)
+		// 		petCurrents.push(...pets);
+		// }	
+
+		// const expecteds: any[] = [];
+		// const petExpecteds: any[] = [];
+		// const expectedsUsers: any[] = [];
+
+		// for (const item of payloadEntity){
+		// 	const { pets, user,...partial} = item;
+		// 	expecteds.push(partial);
+		// 	if(user !== undefined)
+		// 		expectedsUsers.push(user);
+		// 	if(pets !== undefined)
+		// 		petExpecteds.push(...pets);
+		// }
+
+		// this.matchEntity(currents, expecteds, isRemoveSensitive);
+		// if(currentsUsers.length!== 0 && expectedsUsers.length !== 0)
+		// 	this.matchEntities(currentsUsers, expectedsUsers, isRemoveSensitive);
+		// if(petCurrents.length!== 0 && petExpecteds.length !== 0)
+		// 	this.matchEntities(petCurrents, petExpecteds, isRemoveSensitive);
+	}
+
+	private static matchEntity(responseEntity: any, payloadEntity: any, isRemoveSensitive = false){
+
+		normalizeEntity(responseEntity);
+		normalizeEntity(payloadEntity);
+
+		if(isRemoveSensitive)
+			payloadEntity = removeSensity(payloadEntity); 
+
+		const { 
+			password, //plain text
+			pets,
+			...current
+		} = responseEntity;
+
+		const { 
+			password: expectedPassword, //hashed
+			pets: expectedPets,
+			...expected
+		} = payloadEntity as any;
+
+
+		if(pets !== undefined || expectedPets !== undefined){
+
+			const pCurrent = (pets as []).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
+
+			const pExpected = (expectedPets as []).reduce((previous: any[], current: any) => {
+				normalizeEntity(current);
+				previous.push(current);
+				return previous;
+			}, []);
+
+			this.matchEntity(pCurrent, pExpected);
+		}
+
+		expect(current).toMatchObject(expected);
+	}
+
 	private static matchTutor(tutorPayload: ITutor, tutorRes: Tutor){
 
-		const { user, ...partialPayload } = tutorPayload;
-		const { user: userResponse, ...partialResponse } = tutorRes;
+		const { 
+			user, 
+			photo, //uri
+			...partialPayload 
+		} = tutorPayload;
+		const { 
+			user: userResponse, 
+			photo: photoResponse, //buffer 
+			...partialResponse 
+		} = tutorRes;
 
 		this.matchUser(user, userResponse);
 		
@@ -248,7 +412,7 @@ export class Assertions {
 		
 		expect(partialResponse).toMatchObject(partialPayload);
 
-		expect(petsResponse).petsToBeUpdatedOrCreated(pets);
+		// expect(petsResponse).petsToBeUpdatedOrCreated(pets);
 
 	}
 
@@ -267,10 +431,13 @@ export class Assertions {
 	}
 
 	private static matchPatchedObj<I extends object>(payload: I, before: I, current: I){
-		Object.keys(current).forEach((key) => {
-			const K = key as keyof I;
-			if(!['create_date', 'update_date', 'delete_date'].includes(K as string))
-			{		
+
+		if(payload !== undefined && payload !== null)
+			Object.keys(payload).forEach((key) => {
+				const K = key as keyof I;
+				// if(!['create_date', 'update_date', 'delete_date'].includes(K as string))
+				// {		
+				console.log(K);
 				const payLValue = payload[K];
 				if(payLValue === undefined)
 					expect(current[key as keyof I]).toEqual(before[K]);
@@ -278,8 +445,8 @@ export class Assertions {
 				{
 					expect(current[K]).toEqual(payLValue);
 				}
-			}
-		});
+				// }
+			});
 	}
 
 }

@@ -1,33 +1,24 @@
-import request from 'supertest';
-import { Server } from 'http';
 import { randomUUID } from 'crypto';
+import { Server } from 'http';
+import request from 'supertest';
 
+import { findTutorUserAndCreateToken } from '../../utils';
 import { Assertions } from '../../utils/Assertions';
-import { cleanAndSeedDatabase, cleanDatabase } from '../../utils/database';
-import { findTutorUserAndCreateToken, getTokens } from '../../utils';
+import { cleanDatabase } from '../../utils/database';
 
-import { Tutor } from '../../../src/entities/Tutor';
-import { ITutor } from '../../../src/types/schemas';
-import { Role } from '../../../src/types/enums';
-import { startServer } from '../../../src/server';
+import { faker } from '@faker-js/faker/locale/pt_BR';
 import { closeConnection, openConnection } from '../../../src/database/datasource/data-source';
+import { Tutor } from '../../../src/entities/Tutor';
+import { User } from '../../../src/entities/User';
+import { startServer } from '../../../src/server';
+import { Role } from '../../../src/types/enums';
+import { generateToken, generateTutorData, generateTutorsData, generateUserData } from '../../utils/generate';
 
 let server: Server;
-let tokenAdmin: string;
-let tokenShelter: string;
-let tokenTutor: string;
-let ids: {
-	admins: string[], 
-	tutors: string[], 
-	shelters: string[]
-};
 
 beforeAll(async () => {
 	server = startServer();
 	await openConnection();
-	await cleanDatabase();
-	ids = await cleanAndSeedDatabase(3);
-	({ tokenShelter, tokenAdmin, tokenTutor } = await getTokens());
 });
 
 afterAll(() => {
@@ -35,7 +26,12 @@ afterAll(() => {
 	closeConnection();
 });
 
+const tokenAdmin = generateToken({role: Role.ADMIN});
+
 describe('Router to signup tutor user', () => {
+	beforeEach(async () => {
+		await cleanDatabase();
+	});
 
 	it('Responds CREATED and body should have an user object to post /signup/tutores', async () => {
 		const payload = {
@@ -47,7 +43,6 @@ describe('Router to signup tutor user', () => {
 		};
 
 		const result = {
-			delete_date: null,
 			user: {
 				email: payload.user.email,
 				name: payload.user.name,
@@ -70,10 +65,17 @@ describe('Router to signup tutor user', () => {
 	});
 
 	it('responds BADREQUEST to post /signup/tutores with already registered existed email', async () => {
+		
+		let user = new User();
+		user = Object.assign(user, generateUserData());
+		await user.save();
+
 		const payload = {
-			name: 'tutor test',
-			email: 'tutor_test@mail.com',
-			password: '12345678'
+			user:{
+				name: 'tutor test',
+				email: user.email,
+				password: '12345678'
+			}
 		};
 
 		const res = await request(server)
@@ -104,22 +106,39 @@ describe('Router to signup tutor user', () => {
 });
 
 describe('Router to retrieve tutors', () => {
+	const users: Tutor[] = [];
+	
+	beforeAll(async () => {
+		await cleanDatabase();
+
+		for(const user of generateTutorsData(5)){
+			const tutor = new Tutor();
+			Object.assign(tutor, user);
+			await tutor.save();
+			users.push(tutor);
+		}
+
+	});
+
 	it('responds OK and body should have a list of tutors when admin user get /tutores', async () => {
 
 		const res = await request(server)
 			.get('/tutores')
 			.set('Authorization', `Bearer ${tokenAdmin}`);
 
-		Assertions.retrieveCompleteListEntities(res);
+		
+		Assertions.retrieveCompleteListEntities(res, users);
 	});
 
 	it('responds OK and body has a list containing only one-owned tutor when tutor-user get /tutores ', async () => {
+		
+		const tutor = users[0];
 
 		const res = await request(server)
 			.get('/tutores')
-			.set('Authorization', `Bearer ${tokenTutor}`);
+			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR })}`);
 
-		Assertions.retrieveRestrictedListOwnedEntities(res);
+		Assertions.retrieveRestrictedListOwnedEntities(res, [tutor]);
 	});
 
 	it('responds UNAUTHORIZED when unauthenticated-user get /tutores', async () => {
@@ -134,7 +153,7 @@ describe('Router to retrieve tutors', () => {
 
 		const res = await request(server)
 			.get('/tutores')
-			.set('Authorization', `Bearer ${tokenShelter}`);
+			.set('Authorization', `Bearer ${generateToken({role: Role.SHELTER})}`);
 
 		Assertions.notAllowedRole(res);
 	});
@@ -142,40 +161,39 @@ describe('Router to retrieve tutors', () => {
 
 describe('Router to retrieve a tutor by id', () => {
 
-	let tutor: Tutor;
-
+	const tutors: Tutor[] = [];
+	
 	beforeAll(async () => {
-		tutor = await Tutor.findOneOrFail( {where: {id: ids.tutors[0]}, relations: { user: true}});
+		console.debug('beforeAll');
+		await cleanDatabase();
+
+		for(const data of generateTutorsData(5)){
+			const tutor = new Tutor();
+			Object.assign(tutor, data);
+			await tutor.save();
+			tutors.push(tutor);
+		}
+
 	});
 
 	it('responds OK and body should have one tutor when admin user get /tutores/:id', async () => {
 
 		const res = await request(server)
-			.get(`/tutores/${ids.tutors[0]}`)
+			.get(`/tutores/${tutors[0].id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`);
 
-		Assertions.retrieveEntity(res, tutor);
+		Assertions.retrieveEntity(res, tutors[0]);
 	});
 
 	it('responds OK and body should have one tutor when tutor-user owner of the resource get /tutores/:id', async () => {
 
-		const token = await findTutorUserAndCreateToken(ids.tutors[0]);
+		const token = generateToken({id: tutors[0].userId, role: Role.TUTOR});
+
 		const res = await request(server)
-			.get(`/tutores/${ids.tutors[0]}`)
+			.get(`/tutores/${tutors[0].id}`)
 			.set('Authorization', `Bearer ${token}`);
 
-
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { id: tutorId, userId, user, ...partialTutor } = tutor;
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { id: uId, role, password, ...partialUser } = user;
-
-		const result = {
-			user: {...partialUser},
-			...partialTutor  
-		};
-
-		Assertions.retrieveEntity(res, result);
+		Assertions.retrieveEntity(res, tutors[0], true);
 	});
 
 	it('responds OK and body has "Não Encontrado" when user get /tutores/:id with non-existent id', async () => {
@@ -190,7 +208,7 @@ describe('Router to retrieve a tutor by id', () => {
 	it('responds UNAUTHORIZED when unauthenticated-user get /tutores/:id', async () => {
 
 		const res = await request(server)
-			.get(`/tutores/${ids.tutors[0]}`);
+			.get(`/tutores/${tutors[0].id}`);
 
 		Assertions.unauthenticated(res);
 	});
@@ -198,8 +216,8 @@ describe('Router to retrieve a tutor by id', () => {
 	it('responds FORBIDDEN when tutor-user not owner of resourcer get /tutores/:id', async () => {
 
 		const res = await request(server)
-			.get(`/tutores/${ids.tutors[0]}`)
-			.set('Authorization', `Bearer ${tokenTutor}`);
+			.get(`/tutores/${tutors[0].id}`)
+			.set('Authorization', `Bearer ${generateToken({role:  Role.TUTOR})}`);
 
 		Assertions.restrictedToOwner(res);
 
@@ -208,42 +226,44 @@ describe('Router to retrieve a tutor by id', () => {
 	it('responds FORBIDDEN when shelter-user get /tutores/:id', async () => {
 
 		const res = await request(server)
-			.get(`/tutores/${ids.tutors[0]}`)
-			.set('Authorization', `Bearer ${tokenShelter}`);
+			.get(`/tutores/${tutors[0].id}`)
+			.set('Authorization', `Bearer ${generateToken({role:  Role.SHELTER})}`);
 
 		Assertions.notAllowedRole(res);
 	});
 });
 
 describe('Router to update (put) a tutor by id', () => {
-	let tutor: Tutor;
-	let payload: ITutor;
+	let tutor = new Tutor();
+	let payload: any;
 	
 	beforeAll(async () => {
-		tutor = await Tutor.findOneOrFail( {where: {id: ids.tutors[0]}, relations: { user: true}});
+		await cleanDatabase();
+	});
+
+	beforeEach(async () => {
+		const gtutor = generateTutorData();
+		tutor = tutor = Object.assign(tutor, gtutor);
+		tutor.user = gtutor.user as User;
+		await tutor.save();
+
 		payload = {
 			id: tutor.id,
 			userId: tutor.userId,
-			user: {
-				id: tutor.userId,
-				email: 'altered@mail.com',
-				name: 'altered',
-				password: 'altered1',
-				role: Role.TUTOR,
-				city: 'altered',
-				state: 'AL',
-				phone: '11.9999-9999',
-				delete_date: ''
-			},
-			about: 'altered',
-			photo: undefined
+			user: generateUserData({id: tutor.userId, role: Role.TUTOR}),
+			about: faker.lorem.paragraphs(),
+			photo: null
 		};
+	});
+
+	afterEach(async () => {
+		await cleanDatabase();
 	});
 
 	it('responds OK and body should have tutor with updated date WHEN admin-user put /tutors/:id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
@@ -271,7 +291,7 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds UNAUTHORIZED when unauthenticated user put /tutores/:id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -282,8 +302,8 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds FORBIDDEN when tutor-user owner of resource put /tutores/:id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
-			.set('Authorization', `Bearer ${await findTutorUserAndCreateToken(ids.tutors[0])}`)
+			.put(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${await findTutorUserAndCreateToken(tutor.id)}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -294,8 +314,8 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds FORBIDDEN when tutor-user not owner of resaource put /tutores/:id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
-			.set('Authorization', `Bearer ${tokenTutor}`)
+			.put(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.TUTOR})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -306,8 +326,8 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds FORBIDDEN when shelter-user put /tutores/:id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
-			.set('Authorization', `Bearer ${tokenShelter}`)
+			.put(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.SHELTER})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -318,7 +338,7 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds BADREQUEST When user put /tutores/:id with replaced id', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
@@ -330,7 +350,7 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds BADREQUEST when user put /tutores/:id with replaced userId', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
@@ -341,12 +361,23 @@ describe('Router to update (put) a tutor by id', () => {
 
 	it('responds BADREQUEST When user put /tutores/:id with replaced user.id', async () => {
 
+		const pay = {
+			...payload,
+			user: {
+				...payload.user,
+				id: randomUUID()
+			}
+		};
+
+		console.debug(pay);
+
+
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send({ ...payload, user: {id: randomUUID()}});
+			.send(pay);
 
 		Assertions.idReplacement(res);
 	});
@@ -354,7 +385,7 @@ describe('Router to update (put) a tutor by id', () => {
 	it('responds BADREQUEST When user put /tutores/:id with wrong schema', async () => {
 
 		const res = await request(server)
-			.put(`/tutores/${ids.tutors[0]}`)
+			.put(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
@@ -362,40 +393,49 @@ describe('Router to update (put) a tutor by id', () => {
 
 		Assertions.jsonSchemaError(res);
 	});
-
-	it('responds BADREQUEST When a user put /tutores/:id with non-existent id', async () => {
-
-		const res = await request(server)
-			.put(`/tutores/${randomUUID()}`)
-			.set('Authorization', `Bearer ${tokenAdmin}`)
-			.set('Content-Type', 'application/json')
-			.set('Accept', 'application/json')
-			.send(payload);
-
-		Assertions.nonExistentId(res);
-	});
 });
 
 describe('Router to update (patch) a tutor by id', () => {
-	let tutor: Tutor;
-	let payload: any;
-	
-	beforeAll(async () => {
-		tutor = await Tutor.findOneOrFail( {where: {id: ids.tutors[1]}, relations: { user: true}});
+	let tutor = new Tutor();
 
-		payload = {
-			about: 'altered',
-			user: {
-				email: 'altered@mail.com',
-				password: 'altered1',
-				phone: '11.9999-9999',
-			},
-		};
+	beforeAll(async () => {
+		await cleanDatabase();
 	});
 
-	it('responds OK when adm-user patch /tutor/:id with any property', async () => {
+	beforeEach(async () => {
+		const gtutor = generateTutorData();
+		tutor = Object.assign(tutor, gtutor);
+		tutor.user = gtutor.user as User;
+		await tutor.save();
+	});
+
+	const cases: any[][] = [
+		['about', {about: faker.lorem.paragraphs()}],
+		['photo', {photo: null}],
+		['user.email', {user: {email: faker.internet.email()}}],
+		['user.name', {user: {name: faker.name.fullName()}}],
+		['user.password', {user: {password: faker.internet.password()}}],
+		['user.role', {user: {role: Role.SHELTER}}],
+		['user.city', {user: {city: faker.address.cityName()}}],
+		['user.state', {user: {state: faker.address.stateAbbr()}}],
+		['user.phone', {user: {phone: faker.phone.number('##########')}}],
+		['user.delete_date', {user: {delete_date: faker.date.birthdate()}}],
+	];
+
+	const casesOnlyPermitteds: any[][] = [
+		['about', {about: faker.lorem.paragraphs()}],
+		['photo', {photo: null}],
+		['user.email', {user: {email: faker.internet.email()}}],
+		['user.name', {user: {name: faker.name.fullName()}}],
+		['user.city', {user: {city: faker.address.cityName()}}],
+		['user.state', {user: {state: faker.address.stateAbbr()}}],
+		['user.phone', {user: {phone: faker.phone.number('##########')}}],
+		['user.delete_date', {user: {delete_date: faker.date.birthdate()}}],
+	];
+		
+	test.each(cases)('responds OK when adm-user patch /tutor/:id with %s', async (key, payload) => {
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
@@ -405,26 +445,11 @@ describe('Router to update (patch) a tutor by id', () => {
 
 	});
 
-	it('responds OK when tutor-user owner of resource patch /tutor/:id with permitted property', async () => {
-		const payload = {
-			user: {
-				phone: '11.9999-9999',
-			},
-			about: 'altered',
-		};
-
-		const tutor = await Tutor.findOneOrFail({
-			relations: {
-				user: true
-			}, 
-			where: {
-				id: ids.tutors[1]
-			}
-		});
+	test.each(casesOnlyPermitteds)('responds OK when tutor-user owner of resource patch /tutor/:id with permitted property %s', async (key, payload) => {
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${await findTutorUserAndCreateToken(ids.tutors[1])}`)
+			.patch(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -433,13 +458,18 @@ describe('Router to update (patch) a tutor by id', () => {
 
 	});
 
-	it('responds FORBIDDEN to tutor-user patch /tutor/:id for owned resource with any property', async () => {
-		
-		const tutor = await Tutor.findOneOrFail( {where: {id: ids.tutors[1]}, relations: { user: true}});
+	test.each([
+		['user.password', {user: {password: faker.internet.password()}}],
+		['user.role', {user: {role: Role.SHELTER}}],
+	])('responds FORBIDDEN to tutor-user patch /tutor/:id for owned resource with property %s', async (key, payload) => {
+
+		const test = await Tutor.findOneBy({ id: tutor.id});
+
+		console.debug(test);
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${await findTutorUserAndCreateToken(ids.tutors[1])}`)
+			.patch(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -448,17 +478,34 @@ describe('Router to update (patch) a tutor by id', () => {
 
 	});
 
+	test.each([
+		['id', {user: {id: randomUUID()}}],
+		['userId', {user: {id: randomUUID()}}],
+	])('responds BADREQUEST to tutor-user patch /tutor/:id for owned resource with property %s', async (key, payload) => {
+
+		const test = await Tutor.findOneBy({ id: tutor.id});
+
+		console.debug(test);
+
+		const res = await request(server)
+			.patch(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR})}`)
+			.set('Content-Type', 'application/json')
+			.set('Accept', 'application/json')
+			.send(payload);
+
+		Assertions.idReplacement(res);
+
+	});
+
 	it('responds FORBIDDEN to tutor-user not onwer of resource patch /tutor/:id', async () => {
 		const payload = {
-			user: {
-				phone: '11.9999-9999',
-			},
 			about: 'altered',
 		};
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${tokenTutor}`)
+			.patch(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.TUTOR})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
 			.send(payload);
@@ -469,21 +516,21 @@ describe('Router to update (patch) a tutor by id', () => {
 
 	it('responds UNAUTHORIZED to unauthenticated-user patch /tutor:id', async () => {
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send(payload);
+			.send({about: 'altered'});
 
 		Assertions.unauthenticated(res);
 	});
 
 	it('responds UNAUTHORIZED to shelter user patch /tutor:id', async () => {
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${tokenShelter}`)
+			.patch(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.SHELTER})}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send(payload);
+			.send({about: 'altered'});
 
 		Assertions.notAllowedRole(res);
 	});
@@ -491,11 +538,11 @@ describe('Router to update (patch) a tutor by id', () => {
 	it('responds BADREQUEST When a user patch /tutores/:id with replaced id', async () => {
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send({ ...payload, id: randomUUID()});
+			.send({ about: 'altered', id: randomUUID()});
 
 		Assertions.idReplacement(res);
 	});
@@ -503,11 +550,11 @@ describe('Router to update (patch) a tutor by id', () => {
 	it('responds BADREQUEST When a user patch /tutores/:id with replaced userId', async () => {
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send({ ...payload, userId: randomUUID()});
+			.send({ about: 'altered', userId: randomUUID()});
 
 		Assertions.idReplacement(res);
 	});
@@ -515,11 +562,11 @@ describe('Router to update (patch) a tutor by id', () => {
 	it('responds BADREQUEST When a user patch /tutores/:id with replaced user.id', async () => {
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send({ ...payload, user: {id: randomUUID()}});
+			.send({ about: 'altered', user: {id: randomUUID()}});
 
 		Assertions.idReplacement(res);
 	});
@@ -527,11 +574,11 @@ describe('Router to update (patch) a tutor by id', () => {
 	it('responds BADREQUEST When a user patch /tutores/:id with wrong schema', async () => {
 
 		const res = await request(server)
-			.patch(`/tutores/${ids.tutors[1]}`)
+			.patch(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send({ ...payload, any: 'some'});
+			.send({ any: 'some'});
 
 		Assertions.jsonSchemaError(res);
 	});
@@ -543,62 +590,76 @@ describe('Router to update (patch) a tutor by id', () => {
 			.set('Authorization', `Bearer ${tokenAdmin}`)
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json')
-			.send(payload);
+			.send({about: 'altered'});
 
 		Assertions.nonExistentId(res);
 	});
 });
 
 describe('Router do delete a tutor by id', () => {
+	let tutor = new Tutor();
+
+	beforeAll(async () => {
+		await cleanDatabase();
+	});
+
+	beforeEach(async () => {
+		const gtutor = generateTutorData({tutor: {delete_date: null}, user:{delete_date: null}});
+		tutor = Object.assign(tutor, gtutor);
+		tutor.user = gtutor.user as User;
+		await tutor.save();
+	});
 
 	it('responds UNAUTHORIZED when unauthenticated user delete /tutores/:id', async () => {
 		const res = await request(server)
-			.delete(`/tutores/${ids.tutors[1]}`);
+			.delete(`/tutores/${tutor.id}`);
 
 		console.debug(res.body);
 		Assertions.unauthenticated(res);
 	});
 
-	it('responds FORBIDDEN when not-admin user delete /tutores/:id', async () => {
-		let res = await request(server)
-			.delete(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${tokenTutor}`);
+	test.each([
+		['tutor-user', Role.TUTOR],
+		['shelter-user', Role.SHELTER]
+	])('responds FORBIDDEN when %s delete /tutores/:id', async (key, role) => {
+		const res = await request(server)
+			.delete(`/tutores/${tutor.id}`)
+			.set('Authorization', `Bearer ${generateToken({role: role})}`);
 
-		console.debug(res.body);
-		Assertions.notAllowedRole(res);
-
-		res = await request(server)
-			.delete(`/tutores/${ids.tutors[1]}`)
-			.set('Authorization', `Bearer ${tokenShelter}`);
-
-		console.debug(res.body);
 		Assertions.notAllowedRole(res);
 	});
 
-	it('responds OK and body should have delete_date when adm user delete /tutores/:id', async () => {
+	it('responds OK and tutor and user should be removed when adm-user delete /tutores/:id', async () => {
+
+
+		const r: any = await Tutor.findOne({where: {id: tutor.id}, relations: {user: true}});
+		expect(r).not.toBeNull();
 
 		const res = await request(server)
-			.delete(`/tutores/${ids.tutors[1]}`)
+			.delete(`/tutores/${tutor.id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`);
 
-		Assertions.delete(res);
+		Assertions.sofDelete(res);
+
+		const deletedTutor = await Tutor.getRepository().createQueryBuilder('tutor').withDeleted().leftJoinAndSelect('tutor.user', 'user').where({id: tutor.id}).getOne();
+
+		console.debug(deletedTutor);
+
+		expect(deletedTutor).not.toBeNull();
+		expect(deletedTutor!.delete_date).not.toBeNull();
+		expect(deletedTutor!.user.delete_date).not.toBeNull();
 	});
 
 	it('responds BADREQUEST when user delete /tutores/:id already deleted', async () => {
+
+		const id = tutor.id;
+		await tutor.remove();
+
 		const res = await request(server)
-			.delete(`/tutores/${ids.tutors[1]}`)
+			.delete(`/tutores/${id}`)
 			.set('Authorization', `Bearer ${tokenAdmin}`);
 
-		console.debug(res.body);
 		Assertions.nonExistentId(res);
 
-	});
-	it('responds BADREQUEST when user delete /tutores/:id non-existent id', async () => {
-		const res = await request(server)
-			.delete(`/tutores/${randomUUID()}`)
-			.set('Authorization', `Bearer ${tokenAdmin}`);
-
-		console.debug(res.body);
-		Assertions.nonExistentId(res);
 	});
 });

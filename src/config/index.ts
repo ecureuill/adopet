@@ -14,7 +14,7 @@ export const dataSouceOptions: DataSourceOptions = {
 	username: process.env.POSTGRES_USER,
 	password: process.env.POSTGRES_PASSWORD,
 	database: process.env.NODE_ENV === 'test'? process.env.POSTGRES_DATABASE_TEST : process.env.POSTGRES_DATABASE,
-	synchronize: false,
+	synchronize: process.env.NODE_ENV === 'test',
 	logging: false,
 	entities: ['./src/entities/*.ts'],
 	migrations: ['./src/database/migration/*.ts'],

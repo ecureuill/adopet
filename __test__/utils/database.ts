@@ -5,6 +5,7 @@ import { Tutor } from '../../src/entities/Tutor';
 import { User } from '../../src/entities/User';
 import { Role } from '../../src/types/enums';
 import { IPet, IUser } from '../../src/types/schemas';
+import { generatePetData } from './generate';
 
 export const cleanDatabase = async () => {
 	try {
@@ -128,16 +129,7 @@ export const seedDataBasePets = async (count = 3) => {
 	shelter = await shelter.save();
 
 	for(let i = 1; i <=count; i++ ){
-		shelter.pets.push(new Pet({
-			adopted: false,
-			age: i,
-			age_unit: 'y',
-			size_variety: 'm',
-			type: 'dog',
-			name: `pet_${i}`,
-			shelterId: shelter.id
-
-		} as IPet));
+		shelter.pets.push(generatePetData({name: `pet_${i}`}) as Pet);
 	}
 		
 	shelter = await shelter.save();
@@ -207,4 +199,22 @@ export const findShelterByUserEmail = async (email: string) => {
 		where: {userId: (await user).id},
 		relations: { user: true, pets: true}
 	});
+};
+
+export const saveShelter = async (shelter: Shelter) => {
+	const {user, pets, ...expected} = shelter;
+
+	const newUser = new User(user);
+	await newUser.save();
+
+	const newShelter = new Shelter();
+	Object.assign(newShelter, expected);
+
+	newShelter.user = newUser;
+	await newShelter.save();
+
+	newShelter.pets = pets;
+	await newShelter.save();
+
+	return newShelter;
 };
