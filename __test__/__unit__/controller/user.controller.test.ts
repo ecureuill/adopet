@@ -63,7 +63,8 @@ describe('User Controller', () => {
 			const controller = new UserController(settings);
 			const result = controller.auth(email, password);
 			
-			await expect(result).rejects.toThrow(EntityNotFoundError);
+			await expect(result).rejects.toThrow(createHttpError.Unauthorized);
+			await expect(result).rejects.toThrow('Invalid credentials');
 			expect(findOneByOrFail).toBeCalled();
 
 		});
