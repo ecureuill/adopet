@@ -10,6 +10,8 @@ import createHttpError from 'http-errors';
 import Controller from '../../../src/controller';
 import { getMockRepository } from '../../utils/mocks';
 import { EntityNotFoundError } from 'typeorm';
+import { IdReplacementError, NotOwnerError } from '../../../src/utils/errors/business.errors';
+import { BadRequestError } from '../../../src/utils/errors/http.errors';
 
 describe('Pet Controller', () => {
 	let settings: IUserSettings;
@@ -45,7 +47,7 @@ describe('Pet Controller', () => {
 		it('should return ForbiddenError:Owner', async () => {
 			const pet = generatePetData() as Pet;
 
-			checkPetOwner.mockRejectedValue(new createHttpError.Forbidden('Only owner is authorized to perform this action'));
+			checkPetOwner.mockRejectedValue(new NotOwnerError());
 
 			settings.permission.ownershipRequired = true;
 
@@ -53,14 +55,14 @@ describe('Pet Controller', () => {
 
 			const result = controller.create(pet);
 
-			await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+			await expect(result).rejects.toThrow(NotOwnerError);
 			expect(checkPetOwner).toHaveBeenCalled();
 		});
 
 		it('should return BADREQUEST:Shelter', async () => {
 			const pet = generatePetData() as Pet;
 
-			checkPetOwner.mockRejectedValue(new createHttpError.BadRequest('Shelter does not exist'));
+			checkPetOwner.mockRejectedValue(new BadRequestError('Shelter does not exist'));
 			
 			settings.permission.ownershipRequired = true;
 
@@ -115,7 +117,7 @@ describe('Pet Controller', () => {
 				const result = await controller.updateAll(pet, randomUUID());
 			}
 			catch(err){
-				expect(err).toBeInstanceOf(createHttpError.BadRequest);
+				expect(err).toBeInstanceOf(IdReplacementError);
 				expect((err as Error).message).toBe('id replacememt is not allowed');
 			}
 			finally {

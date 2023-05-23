@@ -1,13 +1,12 @@
 import { dataSource } from '../database/datasource/data-source';
 import { User } from '../entities/User';
 import { passwordCompareHash, passwordToHash } from '../services/passwords';
-import createError from 'http-errors';
 import { createJwtToken } from '../services/tokens';
 import { Role } from '../types/enums';
 import { IUserSettings } from '../types/interfaces';
 import Controller from '.';
-import createHttpError from 'http-errors';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
+import { SignInLoginError, SignUPEmailError } from '../utils/errors/business.errors';
 
 export default class UserController extends Controller<User> {
 	private static alias = 'user';
@@ -34,13 +33,13 @@ export default class UserController extends Controller<User> {
 		}
 		catch (err){
 			if(err instanceof EntityNotFoundError)
-				throw new createError.Unauthorized('Invalid credentials');
+				throw new SignInLoginError();
 			
 			throw err;
 		}
 		
 		if(!passwordCompareHash(password, entity.password))
-			throw new createError.Unauthorized('Invalid credentials');
+			throw new SignInLoginError();
 
 		return createJwtToken({id: entity.id, role: entity.role});
 	}
@@ -55,7 +54,7 @@ export default class UserController extends Controller<User> {
 		}
 		catch (err){
 			if(err instanceof QueryFailedError && err.message.startsWith('duplicate key value violates unique constraint'))
-				throw new createHttpError.BadRequest('Email already exist');
+				throw new SignUPEmailError();
 			throw err;
 		}
 

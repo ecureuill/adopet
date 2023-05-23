@@ -28,8 +28,8 @@ export class Assertions {
 	}
 
 	static notAllowedEntityUpdate(res: Response){
-		expect(res.body.message).toBe('PUT is not authorized');
-		expect(res.statusCode).toBe(HTTP_RESPONSE.Forbidden);
+		expect(res.body.message).toBe('PUT is not allowed');
+		expect(res.statusCode).toBe(HTTP_RESPONSE.MethodNotAllowed);
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 

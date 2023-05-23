@@ -8,6 +8,7 @@ import { Role } from '../types/enums';
 import { IUserSettings } from '../types/interfaces';
 import { ITutor, IUser } from '../types/schemas';
 import createHttpError from 'http-errors';
+import { SignUPEmailError } from '../utils/errors/business.errors';
 
 export default class TutorController extends Controller<Tutor> {
 	private static alias = 'tutor';
@@ -40,7 +41,7 @@ export default class TutorController extends Controller<Tutor> {
 		}
 		catch (err){
 			if(err instanceof QueryFailedError && err.message.startsWith('duplicate key value violates unique constraint'))
-				throw new createHttpError.BadRequest('Email already exist');
+				throw new SignUPEmailError();
 			throw err;
 		}
 	}

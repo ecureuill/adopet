@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker/locale/pt_BR';
 import { randomUUID } from 'crypto';
-import createHttpError from 'http-errors';
 import { EntityNotFoundError, TypeORMError } from 'typeorm';
 import Controller from '../../../src/controller';
 import UserController from '../../../src/controller/user.controller';
@@ -11,6 +10,7 @@ import { Role } from '../../../src/types/enums';
 import { IUserSettings } from '../../../src/types/interfaces';
 import { generateUserData } from '../../utils/generate';
 import { getMockRepository } from '../../utils/mocks';
+import { SignInLoginError } from '../../../src/utils/errors/business.errors';
 
 describe('User Controller', () => {
 	let settings: IUserSettings;
@@ -63,8 +63,7 @@ describe('User Controller', () => {
 			const controller = new UserController(settings);
 			const result = controller.auth(email, password);
 			
-			await expect(result).rejects.toThrow(createHttpError.Unauthorized);
-			await expect(result).rejects.toThrow('Invalid credentials');
+			await expect(result).rejects.toThrow(SignInLoginError);
 			expect(findOneByOrFail).toBeCalled();
 
 		});
@@ -78,7 +77,7 @@ describe('User Controller', () => {
 			const controller = new UserController(settings);
 			const result = controller.auth(email, password);
 			
-			await expect(result).rejects.toThrow(createHttpError.Unauthorized);
+			await expect(result).rejects.toThrow(SignInLoginError);
 			expect(findOneByOrFail).toBeCalled();
 
 		});

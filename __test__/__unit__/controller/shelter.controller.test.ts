@@ -13,6 +13,7 @@ import { generateShelterData } from '../../utils/generate';
 import { getMockRepository } from '../../utils/mocks';
 import { Pet } from '../../../src/entities/Pet';
 import * as validations from '../../../src/services/validations';
+import { IdReplacementError } from '../../../src/utils/errors/business.errors';
 
 describe('Shelter Controller', () => {
 	let settings: IUserSettings;
@@ -74,7 +75,7 @@ describe('Shelter Controller', () => {
 				const result = await controller.updateAll(shelter, randomUUID());
 			}
 			catch(err){
-				expect(err).toBeInstanceOf(createHttpError.BadRequest);
+				expect(err).toBeInstanceOf(IdReplacementError);
 				expect((err as Error).message).toBe('id replacememt is not allowed');
 			}
 			finally {

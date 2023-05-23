@@ -1,4 +1,4 @@
-import createHttpError from 'http-errors';
+import { NotImplementedError } from "./errors/code.errors";
 
 export interface Variant {
 	[key: string]: string | Buffer;
@@ -64,7 +64,7 @@ const loopObject = (objArray: Array<object>, entityArray: Array<object>) => {
 				}
 			}
 			else {
-				throw new createHttpError.NotImplemented('array of not objects');
+				throw new NotImplementedError();
 				//To DO
 			}
 		});

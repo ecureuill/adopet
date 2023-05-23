@@ -6,8 +6,8 @@ import { passwordToHash } from '../services/passwords';
 import { idReplacememtIsNotAllowed } from '../services/validations';
 import { Role } from '../types/enums';
 import { IUserSettings } from '../types/interfaces';
-import createHttpError from 'http-errors';
 import { IShelter, IUser } from '../types/schemas';
+import { SignUPEmailError } from '../utils/errors/business.errors';
 
 export default class ShelterController extends Controller<Shelter>{
 
@@ -48,7 +48,7 @@ export default class ShelterController extends Controller<Shelter>{
 		}
 		catch (err){
 			if(err instanceof QueryFailedError && err.message.startsWith('duplicate key value violates unique constraint'))
-				throw new createHttpError.BadRequest('Email already exist');
+				throw new SignUPEmailError();
 			throw err;
 		}
 	}

@@ -9,6 +9,9 @@ import { IUserSettings } from '../../../src/types/interfaces';
 import { IPet, IShelter, IUser } from '../../../src/types/schemas';
 import { USER_NOT_AUTHENTICATED } from '../../../src/utils/consts';
 import { generatePetData, generateShelterData, generateUserData } from '../../utils/generate';
+import { BadRequestError, MethodNotAllowedError, PatchPropertyAllowedError } from '../../../src/utils/errors/http.errors';
+import { MisconfiguredError } from '../../../src/utils/errors/code.errors';
+import { NotOwnerError } from '../../../src/utils/errors/business.errors';
 
 describe('phoneRegex', () => {
 	const regex = RegExp(phoneRegex);
@@ -141,11 +144,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 1);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toEqual('PUT is not authorized');
+			expect(err).toBeInstanceOf(MethodNotAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -157,11 +159,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 2);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toEqual('PUT is not authorized');
+			expect(err).toBeInstanceOf(MethodNotAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -178,11 +179,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
-			expect(err.message).toEqual('Permissions are misconfigured');
+			expect(err).toBeInstanceOf(MisconfiguredError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 
 
@@ -195,11 +195,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toEqual('PUT is not authorized');
+			expect(err).toBeInstanceOf(MethodNotAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -211,11 +210,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toEqual('PUT is not authorized');
+			expect(err).toBeInstanceOf(MethodNotAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -232,11 +230,10 @@ describe('isPutAllowedOrFail', () =>{
 			isPutAllowedOrFail(userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toEqual('PUT is not authorized');
+			expect(err).toBeInstanceOf(MethodNotAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 });
@@ -266,11 +263,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
-			expect(err.message).toEqual('Permissions are misconfigured');
+			expect(err).toBeInstanceOf(MisconfiguredError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -281,11 +277,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.InternalServerError);
-			expect(err.message).toEqual('Permissions are misconfigured');
+			expect(err).toBeInstanceOf(MisconfiguredError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -295,11 +290,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toContain('update is not authorized');
+			expect(err).toBeInstanceOf(PatchPropertyAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -309,11 +303,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 0);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toContain('update is not authorized');
+			expect(err).toBeInstanceOf(PatchPropertyAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -323,11 +316,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 2);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toContain('update is not authorized');
+			expect(err).toBeInstanceOf(PatchPropertyAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -337,11 +329,10 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 			isPropertyUpdateAllowedOrFail(shelter, userSettings, 2);
 		}
 		catch(err: any){
-			expect(err).toBeInstanceOf(createHttpError.Forbidden);
-			expect(err.message).toContain('update is not authorized');
+			expect(err).toBeInstanceOf(PatchPropertyAllowedError);
 		}
 		finally{
-			expect.assertions(2);
+			expect.assertions(1);
 		}
 	});
 
@@ -377,11 +368,11 @@ describe('checkPetOwner', () =>{
 
 	it('Should throw error: Owner', async () => {
 		const result = checkPetOwner(pet as Pet, randomUUID() );
-		await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+		await expect(result).rejects.toThrow(NotOwnerError);
 	});
 
 	it('Should throw error: Shelter', async () => {
-		findOneBy.mockRejectedValue(new createHttpError.BadRequest('Shelter does not exist'));
+		findOneBy.mockRejectedValue(new BadRequestError('Shelter does not exist'));
 
 		const result = checkPetOwner(pet as Pet, randomUUID() );
 		await expect(result).rejects.toThrow('Shelter does not exist');

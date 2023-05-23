@@ -6,6 +6,8 @@ import { User } from '../../../src/entities/User';
 import { Role } from '../../../src/types/enums';
 import { generateUserData, generateUsersData } from '../../utils/generate';
 import { getMockRepository } from '../../utils/mocks';
+import { IdReplacementError, NotOwnerError } from '../../../src/utils/errors/business.errors';
+import { MethodNotAllowedError, PatchPropertyAllowedError } from '../../../src/utils/errors/http.errors';
 
 describe('Generic Controller', () => {
 	let settings: settings;
@@ -198,7 +200,7 @@ describe('Generic Controller', () => {
 				
 				const result = controller.getOneById(randomUUID());
 				
-				await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+				await expect(result).rejects.toThrow(NotOwnerError);
 			});
 
 			it('should return EntityNotFoundError', async () => {
@@ -250,7 +252,7 @@ describe('Generic Controller', () => {
 				
 				const result = controller.updateAll(user, user.id);
 				
-				await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+				await expect(result).rejects.toThrow(NotOwnerError);
 			});
 
 			it('should return ForbiddenError: PUT', async () => {
@@ -261,7 +263,7 @@ describe('Generic Controller', () => {
 				
 				const result = controller.updateAll(user, user.id);
 				
-				await expect(result).rejects.toThrow('PUT is not authorized');
+				await expect(result).rejects.toThrow(MethodNotAllowedError);
 			});
 
 			it('should return BADREQUEST: ID ', async () => {
@@ -271,7 +273,7 @@ describe('Generic Controller', () => {
 				
 				const result = controller.updateAll(user, randomUUID());
 				
-				await expect(result).rejects.toThrow('id replacememt is not allowed');
+				await expect(result).rejects.toThrow(IdReplacementError);
 			});
 
 			it('should update user', async () => {
@@ -334,7 +336,7 @@ describe('Generic Controller', () => {
 				const controller = new Controller(settings, User);
 				const result = controller.updateSome(user, user.id);
 
-				await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+				await expect(result).rejects.toThrow(NotOwnerError);
 				expect(rep).toHaveBeenCalled();
 			});
 
@@ -349,7 +351,7 @@ describe('Generic Controller', () => {
 				const controller = new Controller(settings, User);
 				const result = controller.updateSome(user, user.id);
 
-				await expect(result).rejects.toThrow('city update is not authorized');
+				await expect(result).rejects.toThrow(PatchPropertyAllowedError);
 				expect(rep).toHaveBeenCalled();
 			});
 
@@ -363,7 +365,7 @@ describe('Generic Controller', () => {
 				const controller = new Controller(settings, User);
 				const result = controller.updateSome(user, randomUUID());
 
-				await expect(result).rejects.toThrow('id replacememt is not allowed');
+				await expect(result).rejects.toThrow(IdReplacementError);
 				expect(rep).toHaveBeenCalled();
 			});
 
@@ -431,7 +433,7 @@ describe('Generic Controller', () => {
 				const controller = new Controller(settings, User);
 				
 				const result = controller.delete(user.id);
-				await expect(result).rejects.toThrow('Only owner is authorized to perform this action');
+				await expect(result).rejects.toThrow(NotOwnerError);
 				expect(rep).toHaveBeenCalled();
 			});
 

@@ -11,6 +11,7 @@ import { IUserSettings } from '../../../src/types/interfaces';
 import { clone } from '../../../src/utils';
 import { generateTutorData } from '../../utils/generate';
 import { getMockRepository } from '../../utils/mocks';
+import { IdReplacementError } from '../../../src/utils/errors/business.errors';
 
 describe('Tutor Controller', () => {
 	let settings: IUserSettings;
@@ -73,7 +74,7 @@ describe('Tutor Controller', () => {
 				const result = await controller.updateAll(tutor, randomUUID());
 			}
 			catch(err){
-				expect(err).toBeInstanceOf(createHttpError.BadRequest);
+				expect(err).toBeInstanceOf(IdReplacementError);
 				expect((err as Error).message).toBe('id replacememt is not allowed');
 			}
 			finally {
@@ -94,7 +95,7 @@ describe('Tutor Controller', () => {
 				const result = await controller.updateAll(tutor, tutor.id);
 			}
 			catch(err){
-				expect(err).toBeInstanceOf(createHttpError.BadRequest);
+				expect(err).toBeInstanceOf(IdReplacementError);
 				expect((err as Error).message).toBe('id replacememt is not allowed');
 			}
 			finally {

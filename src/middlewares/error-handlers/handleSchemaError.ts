@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { JSONSchemaValidatorError } from '../../utils/JSONSchemaValidatorError';
 import { HTTP_RESPONSE } from '../../utils/consts';
+import JSONSchemaValidatorError from '../../utils/errors/JSONSchemaValidatorError';
 
 export const handleSchemaError = (error: JSONSchemaValidatorError, request: Request, response: Response, next: NextFunction) => {
 

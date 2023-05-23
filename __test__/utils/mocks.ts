@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
-import { DataSource, TypeORMError } from 'typeorm';
+import { DataSource, EntityManager, TypeORMError } from 'typeorm';
 
 export const getMockResponse = (): Partial<Response> => {
 	return {

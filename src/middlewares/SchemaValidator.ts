@@ -2,8 +2,9 @@ import Ajv, {ErrorObject, AnySchema} from 'ajv';
 import { NextFunction, Request, Response } from 'express';
 import createError from 'http-errors';
 import { Variant } from '../utils';
-import { JSONSchemaValidatorError } from '../utils/JSONSchemaValidatorError';
 import addFormats from 'ajv-formats';
+import { MisconfiguredSchemaError } from '../utils/errors/code.errors';
+import JSONSchemaValidatorError from '../utils/errors/JSONSchemaValidatorError';
 
 type SchemaValidatorProperties = {
 	schema: string,
@@ -29,7 +30,7 @@ export default class SchemaValidator {
 		const validateAjv = this.ajv.getSchema(schema);
 
 		if(validateAjv === undefined){
-			throw createError(501, { message: 'Schema not founded'});
+			throw new MisconfiguredSchemaError(schema);
 		}
 
 		return (request: Request, response: Response, next: NextFunction) => {

@@ -2,6 +2,7 @@ import { Resource, Role } from '../types/enums';
 import { Actions, Resources } from '../utils/consts';
 import { IActionPermission, IRule } from '../types/interfaces';
 import createError from 'http-errors';
+import { MisconfiguredError } from '../utils/errors/code.errors';
 
 const userSensitiveColumns = [
 	'id', 'role', 'password'
@@ -213,7 +214,7 @@ export const getPermission = (resource: Resource) => {
 	case 'user':
 		return userPermission.permissions;
 	default:
-		throw new createError.InternalServerError(`No permission rules for ${resource}`);
+		throw new MisconfiguredError('Permission rules');
 	}
 };
 

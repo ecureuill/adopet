@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { JSONSchemaValidatorError } from '../../../../src/utils/JSONSchemaValidatorError';
 import {ErrorObject}  from 'ajv';
 import { handleSchemaError } from '../../../../src/middlewares/error-handlers/handleSchemaError';
 import { getMockRequest, getMockResponse } from '../../../utils/mocks';
+import JSONSchemaValidatorError from '../../../../src/utils/errors/JSONSchemaValidatorError';
+import { HTTP_RESPONSE } from '../../../../src/utils/consts';
 
 describe('Schema error handler middleware', () => {
 	const ajvErros: ErrorObject[] = [
@@ -41,7 +42,7 @@ describe('Schema error handler middleware', () => {
 		);
 		
 
-		expect(mockResponse.status).toHaveBeenCalledWith(400);
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.BadRequest);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
 		expect(nextFunction).not.toHaveBeenCalled();
 	});

@@ -1,9 +1,11 @@
 import createError from 'http-errors';
 import { IUserSettings } from '../types/interfaces';
 import { checkAllIncluded, isPropertiesPermissionMisconfigured } from './permissions';
-import createHttpError from 'http-errors';
 import { Shelter } from '../entities/Shelter';
 import { Pet } from '../entities/Pet';
+import { IdReplacementError, NotOwnerError } from '../utils/errors/business.errors';
+import { BadRequestError, MethodNotAllowedError, PatchPropertyAllowedError } from '../utils/errors/http.errors';
+import { MisconfiguredError } from '../utils/errors/code.errors';
 
 export const phoneRegex = '^\\s*(\\d{2}|\\d{0})[-. ]?(\\d{5}|\\d{4})[-. ]?(\\d{4})[-. ]?\\s*$';
 
@@ -11,12 +13,12 @@ export const stateRegex = '^[A-Z]{2}$';
 
 export const idReplacememtIsNotAllowed = (bodyId: string | undefined, paramId: string) => {
 	if(bodyId !== undefined && bodyId !== paramId)
-		throw createError.BadRequest('id replacememt is not allowed');
+		throw new IdReplacementError();
 };
 
 export const isOwnerOrFail = (ownerId: string, id: string) => {
 	if(ownerId !== id)
-		throw createError.Forbidden('Only owner is authorized to perform this action');
+		throw new NotOwnerError();
 
 	return true;
 };
@@ -24,24 +26,24 @@ export const isOwnerOrFail = (ownerId: string, id: string) => {
 export const isPutAllowedOrFail = ({ permission }: IUserSettings, relations: number) => {
 	
 	if(isPropertiesPermissionMisconfigured(permission))
-		throw new createError.InternalServerError('Permissions are misconfigured');
+		throw new MisconfiguredError('Permissions');
 
 	if(permission.excluded !== undefined){
 		if(permission.excluded.length === 0)
 			return true;
 
-		throw new createError.Forbidden('PUT is not authorized');
+		throw new MethodNotAllowedError('PUT');
 	}
 
 	if(permission.included !== undefined){
 		if(permission.included.length === 0)
-			throw new createError.Forbidden('PUT is not authorized');
+			throw new MethodNotAllowedError('PUT');
 
 		if(permission.included.length < relations + 1)
-			throw new createError.Forbidden('PUT is not authorized');
+			throw new MethodNotAllowedError('PUT');
 
 		if(!checkAllIncluded(permission.included))
-			throw new createError.Forbidden('PUT is not authorized');
+			throw new MethodNotAllowedError('PUT');
 	}
 	return true;
 };
@@ -49,7 +51,7 @@ export const isPutAllowedOrFail = ({ permission }: IUserSettings, relations: num
 export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUserSettings, relations: number) => {
 
 	if(isPropertiesPermissionMisconfigured(permission))
-		throw new createError.InternalServerError('Permissions are misconfigured');
+		throw new MisconfiguredError('Permissions');
 
 	const payload: string[] = flatPayloadKeys(body);
 
@@ -61,7 +63,7 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 		
 
 		if(key !== undefined)
-			throw new createError.Forbidden(`${key} update is not authorized`);
+			throw new PatchPropertyAllowedError(key);
 
 		return true;
 	}
@@ -69,7 +71,7 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 	if(permission.included !== undefined){
 
 		if(permission.included.length === 0)
-			throw new createError.Forbidden('Property update is not authorized');
+			throw new PatchPropertyAllowedError();
 		
 		if(checkAllIncluded(permission.included) 
 			&& permission.included.length === relations + 1)
@@ -78,7 +80,7 @@ export const isPropertyUpdateAllowedOrFail = (body: object,  { permission }: IUs
 		const key = payload.find( key => !permission.included?.includes(key));
 
 		if(key !== undefined)
-			throw new createError.Forbidden(`${key} update is not authorized`);
+			throw new PatchPropertyAllowedError(key);
 	}
 
 	return true;
@@ -89,7 +91,7 @@ export const checkPetOwner = async (pet: Pet, userId: string) => {
 	const shelter = await Shelter.findOneBy({id: pet.shelterId});
 
 	if(shelter === null)
-		throw new createHttpError.BadRequest('Shelter does not exist');
+		throw new BadRequestError('Shelter does not exist');
 		
 	return isOwnerOrFail(shelter.userId, userId);
 };

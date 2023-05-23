@@ -2,6 +2,7 @@ import { checkAllIncluded, checkGrant, getPermission, permissions } from '../../
 import { Role } from '../../../src/types/enums';
 import { IActionPermission } from '../../../src/types/interfaces';
 import { Resources } from '../../../src/utils/consts';
+import { MisconfiguredError } from '../../../src/utils/errors/code.errors';
 
 describe('permission by Role', () =>{
 	const permissions_ADM: IActionPermission = {
@@ -138,6 +139,6 @@ describe('getPermission', () => {
 	});
 
 	it('should throw for non-existent permission', () => {
-		expect(() => getPermission('test' as any)).toThrow('No permission rules for test');
+		expect(() => getPermission('test' as any)).toThrow(MisconfiguredError);
 	});
 });
