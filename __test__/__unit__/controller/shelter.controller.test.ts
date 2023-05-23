@@ -67,7 +67,7 @@ describe('Shelter Controller', () => {
 		it('should throw BadRequest:Id', async () => {
 			const shelter = generateShelterData() as Shelter;
 
-			findOneByOrFail.mockReturnValue(Promise.resolve(generateShelterData({id: shelter.id})));
+			findOneByOrFail.mockReturnValue(Promise.resolve(generateShelterData({shelter: {id: shelter.id}})));
 
 			try{
 				const controller = new ShelterController(settings);
@@ -115,13 +115,16 @@ describe('Shelter Controller', () => {
 		it('should udpate', async () => {
 			const shelter = generateShelterData();
 			const superController = jest.spyOn(Controller.prototype, 'updateSome').mockReturnValue(Promise.resolve(shelter));
+			const findOneOrFail = jest.spyOn(Shelter, 'findOneOrFail').mockResolvedValue(shelter as Shelter);
+
 
 			const controller = new ShelterController(settings);
 
 			const result = await controller.updateSome(shelter as Shelter, shelter.id);
 			
 			expect(result).toEqual(shelter);
-			expect(superController).toHaveBeenCalled();
+			expect(superController).toHaveBeenCalledTimes(1);
+			expect(findOneOrFail).toHaveBeenCalledTimes(1);
 		});
 	});
 });

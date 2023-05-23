@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { generateTutorData, generateTutorsData } from '../../utils/generate';
 import { Tutor } from '../../../src/entities/Tutor';
 import { getMockRequest, getMockResponse } from '../../utils/mocks';
+import { HTTP_RESPONSE } from '../../utils/consts';
 
 let mockRequest: Partial<Request>;
 let mockResponse: Partial<Response>;
@@ -29,10 +30,10 @@ describe('Tutor Router', () => {
 		});
 
 		beforeEach(() => {
-			controller = jest.spyOn(TutorController.prototype, 'getAll')
+			controller = jest.spyOn(TutorController.prototype, 'getAll');
 		});
 
-		it('should return 404 - Não encontrado', async () => {
+		it('should return OK - Não encontrado', async () => {
 			controller.mockResolvedValueOnce({
 				count: 0,
 				entities: []
@@ -42,7 +43,7 @@ describe('Tutor Router', () => {
 			const res = await router.getAll(mockRequest as Request, mockResponse as Response);
 
 			expect(res.json).toHaveBeenCalledWith({mensagem: 'Não encontrado'});
-			expect(res.status).toHaveBeenCalledWith(404);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 			expect(controller).toHaveBeenCalledWith();
 			expect(controller).toHaveBeenCalledTimes(1);
 		});
@@ -79,7 +80,7 @@ describe('Tutor Router', () => {
 
 			mockRequest.params = {id: randomUUID()};
 			
-			const result = generateTutorData({id: mockRequest.params!.id});
+			const result = generateTutorData({tutor: {id: mockRequest.params!.id}});
 
 			controller.mockResolvedValueOnce(result);
 
@@ -189,7 +190,7 @@ describe('Tutor Router', () => {
 		it('should delete tutor with status 200', async () => {
 			mockRequest.params = {id: randomUUID()};
 
-			const result = generateTutorData({id: mockRequest.params!.id});
+			const result = generateTutorData({tutor: {id: mockRequest.params!.id}});
 
 			controller.mockResolvedValueOnce(result);
 

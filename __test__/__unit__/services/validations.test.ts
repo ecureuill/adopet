@@ -358,7 +358,7 @@ describe('isPropertyUpdateAllowedOrFail', () =>{
 
 describe('checkPetOwner', () =>{
 	const user: IUser = generateUserData();
-	const shelter: IShelter = generateShelterData({userId: user.id});
+	const shelter: IShelter = generateShelterData({user: {id: user.id}});
 	const pet: IPet = generatePetData({shelterId:shelter.id });
 	let findOneBy: jest.SpyInstance;
 

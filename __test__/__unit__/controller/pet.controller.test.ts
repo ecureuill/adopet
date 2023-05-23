@@ -109,7 +109,7 @@ describe('Pet Controller', () => {
 		it('should throw BadRequest:Id', async () => {
 			const pet = generatePetData() as Pet;
 
-			findOneByOrFail.mockResolvedValue(generateShelterData({id: pet.id}));
+			findOneByOrFail.mockResolvedValue(generateShelterData({pet: {id: pet.id}}));
 			try{
 				const controller = new PetController(settings);
 				const result = await controller.updateAll(pet, randomUUID());

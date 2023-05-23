@@ -6,6 +6,7 @@ import { faker } from '@faker-js/faker/locale/pt_BR';
 import { User } from '../../../src/entities/User';
 import { generateUserData, generateUsersData } from '../../utils/generate';
 import { getMockRequest, getMockResponse } from '../../utils/mocks';
+import { HTTP_RESPONSE } from '../../../src/utils/consts';
 
 describe('User router', () => {
 	let controller: jest.SpyInstance;
@@ -44,10 +45,10 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(mockRequest.body.email, mockRequest.body.password);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 
-		it('should call with OK and result on create', async () => {
+		it('should call with CREATED and result on create', async () => {
 
 			const request = {
 				name: faker.name.fullName(),
@@ -69,7 +70,7 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(request);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(201);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.Created);
 		});
 	});
 
@@ -78,7 +79,7 @@ describe('User router', () => {
 			controller.mockRestore();
 		});
 
-		it('should call with BADREQUEST when result=[] on getall', async () => {
+		it('should call with OK when result=[] on getAll', async () => {
 			const result = {
 				entities: [],
 				count: 0
@@ -91,7 +92,7 @@ describe('User router', () => {
 
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(res.json).toHaveBeenCalledWith({mensagem: 'Não encontrado'});
-			expect(res.status).toHaveBeenCalledWith(404);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 
 		it('should call with OK and list entities on getall', async () => {
@@ -107,7 +108,7 @@ describe('User router', () => {
 
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 	});
 
@@ -128,7 +129,7 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(mockRequest.params.id);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 	});
 
@@ -152,7 +153,7 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(mockRequest.body, mockRequest.params.id);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 	});
 
@@ -179,7 +180,7 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(mockRequest.body, mockRequest.params.id);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 	});
 
@@ -201,7 +202,7 @@ describe('User router', () => {
 			expect(controller).toHaveBeenCalledTimes(1);
 			expect(controller).toHaveBeenCalledWith(mockRequest.params.id);
 			expect(res.json).toHaveBeenCalledWith(result);
-			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.status).toHaveBeenCalledWith(HTTP_RESPONSE.OK);
 		});
 	});
 });

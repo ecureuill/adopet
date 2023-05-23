@@ -49,8 +49,6 @@ export const generateUsersData = (n = 1, overide = {}): IUser[] => {
 };
 
 export const generatePetData = (overide = {}, includeSensitive = true): IPet => {
-	console.debug(`generatePetData ${includeSensitive}`)
-
 	if(includeSensitive)
 		return {
 			id: randomUUID(),
@@ -85,18 +83,25 @@ export const generatePetsData = (n = 1, overide = {}, includeSensitive = true): 
 
 export const generateTutorData = (overide: {
 	tutor?: Partial<ITutor>,
-	user?: Partial<IUser>,
-} = {tutor: {}, user: {}}): ITutor => {
+	user?: Partial<IUser>
+} = {tutor: {}, user: {}}, includeSensitive = true): ITutor => {
 	const user = generateUserData({role: 'tutor', ...overide.user});
 
+	if(includeSensitive)
+		return {
+			user: user,
+			id: randomUUID(),
+			userId: user.id,
+			about: faker.lorem.paragraph(),
+			photo: faker.image.people(),
+			...overide.tutor,
+		};
 	return {
 		user: user,
-		id: randomUUID(),
-		userId: user.id,
 		about: faker.lorem.paragraph(),
 		photo: faker.image.people(),
 		...overide.tutor,
-	};
+	} as ITutor;
 };
 
 export const generateTutorsData = (n = 1, overide: {

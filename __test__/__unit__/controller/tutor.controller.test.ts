@@ -66,7 +66,7 @@ describe('Tutor Controller', () => {
 		it('should throw BadRequest:Id', async () => {
 			const tutor = generateTutorData() as Tutor;
 
-			findOneByOrFail.mockReturnValue(Promise.resolve(generateTutorData({id: tutor.id})));
+			findOneByOrFail.mockReturnValue(Promise.resolve(generateTutorData({tutor: {id: tutor.id}})));
 
 			try{
 				const controller = new TutorController(settings);
@@ -86,7 +86,7 @@ describe('Tutor Controller', () => {
 		it('should throw BadRequest:userId', async () => {
 			const tutor = generateTutorData() as Tutor;
 
-			findOneByOrFail.mockReturnValue(Promise.resolve(generateTutorData({id: tutor.id})));
+			findOneByOrFail.mockReturnValue(Promise.resolve(generateTutorData({tutor: {id: tutor.id}})));
 
 
 			try{
@@ -136,6 +136,7 @@ describe('Tutor Controller', () => {
 		it('should udpate', async () => {
 			const tutor = generateTutorData();
 			const superController = jest.spyOn(Controller.prototype, 'updateSome').mockReturnValue(Promise.resolve(tutor));
+			const findOneByOrFail = jest.spyOn(Tutor, 'findOneByOrFail').mockResolvedValue(tutor as Tutor);
 
 			const controller = new TutorController(settings);
 
@@ -148,7 +149,7 @@ describe('Tutor Controller', () => {
 
 	describe('delete', () => {
 		it('should delete', async () => {
-			const tutor = generateTutorData({delete_date: null});
+			const tutor = generateTutorData({tutor: {delete_date: null}, user: {delete_date: null}});
 
 			const superController = jest.spyOn(Controller.prototype, 'delete').mockReturnValue(Promise.resolve({...tutor, delete_date: Date.toString()}));
 
