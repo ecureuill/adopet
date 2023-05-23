@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { EntityNotFoundError, TypeORMError } from 'typeorm';
-import { HttpError } from 'http-errors';
 import { HTTP_RESPONSE } from '../../utils/consts';
 
 
-export const handleTypeORMError = (error: HttpError, request: Request, response: Response, next: NextFunction) => {
+export const handleTypeORMError = (error: TypeORMError, request: Request, response: Response, next: NextFunction) => {
 
 	if (error instanceof EntityNotFoundError)
 		return response.status(HTTP_RESPONSE.BadRequest).json({
@@ -15,7 +14,7 @@ export const handleTypeORMError = (error: HttpError, request: Request, response:
 		});
 
 	if(error instanceof TypeORMError)
-		return response.status(501).json({
+		return response.status(HTTP_RESPONSE.InternalServerError).json({
 			error_name: `TypeORMErrorGENERIC ${error.name}`,
 			error_msg: error.message,
 			message: error.message

@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import createHttpError, { HttpError } from 'http-errors';
 import { handleError } from '../../../../src/middlewares/error-handlers/handlerError';
 import { getMockRequest, getMockResponse } from '../../../utils/mocks';
+import NotImplementedError from '../../../../src/utils/errors/NotImplementedError';
+import { HTTP_RESPONSE } from '../../../../src/utils/consts';
+import createHttpError from 'http-errors';
 
 describe('Error handler middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -14,8 +16,7 @@ describe('Error handler middleware', () => {
 	});
 
 	it('handle HttpError', async () => {
-		const error = new createHttpError[501]('error test');
-
+		const error = new createHttpError.BadGateway('teste');
 		const err = {
 			message: error.message,
 			error_name: error.name,
@@ -29,12 +30,12 @@ describe('Error handler middleware', () => {
 			nextFunction
 		);
 
-		expect(mockResponse.status).toHaveBeenCalledWith(501);
+		expect(mockResponse.status).toHaveBeenCalledWith(502);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
 		expect(nextFunction).not.toHaveBeenCalled();
 	});
 
-	it('handle custom error without message and number status', async () => {
+	it('handle Node Error without message and number status', async () => {
 		const error = new Error();
 
 		const err = {
@@ -44,13 +45,34 @@ describe('Error handler middleware', () => {
 		};
 
 		handleError(
-			error as HttpError,
+			error,
 			mockRequest as Request,
 			mockResponse as Response,
 			nextFunction
 		);
 
-		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.InternalServerError);
+		expect(mockResponse.json).toHaveBeenCalledWith(err);
+		expect(nextFunction).not.toHaveBeenCalled();
+	});
+
+	it('handle NotImplementedError', async () => {
+		const error = new NotImplementedError();
+
+		const err = {
+			message: 'Not implemented!',
+			error_name: 'NotImplementedError',
+			error_msg: 'Not implemented!',
+		};
+
+		handleError(
+			error,
+			mockRequest as Request,
+			mockResponse as Response,
+			nextFunction
+		);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.InternalServerError);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
 		expect(nextFunction).not.toHaveBeenCalled();
 	});

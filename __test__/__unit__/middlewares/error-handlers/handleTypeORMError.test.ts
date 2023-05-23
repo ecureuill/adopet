@@ -3,6 +3,7 @@ import { handleTypeORMError } from '../../../../src/middlewares/error-handlers/h
 import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
 import { HttpError } from 'http-errors';
 import { getMockRequest, getMockResponse } from '../../../utils/mocks';
+import { HTTP_RESPONSE } from '../../../../src/utils/consts';
 
 describe('TypeORM Error handler middleware', () => {
 	let mockRequest: Partial<Request>;
@@ -19,41 +20,41 @@ describe('TypeORM Error handler middleware', () => {
 		const err = {
 			error_name: error.name,
 			error_msg: error.message,
-			message: 'Não encontrado'
+			message: 'Resource do not exist'
 		};
 
 		handleTypeORMError(
-			error as unknown as HttpError,
+			error,
 			mockRequest as Request,
 			mockResponse as Response,
 			nextFunction
 		);
 		
 
-		expect(mockResponse.status).toHaveBeenCalledWith(404);
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.BadRequest);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
-		expect(nextFunction).not.toHaveBeenCalledTimes(1);
+		expect(nextFunction).not.toHaveBeenCalled();
 	});
 
 	it('handle QueryFailedError', async () => {
 		const error = new QueryFailedError('selec * from users',undefined, {});
 		const err = {
-			error_name: error.name,
+			error_name: `TypeORMErrorGENERIC ${error.name}`,
 			error_msg: error.message,
 			message: error.message
 		};
 
 		handleTypeORMError(
-			error as unknown as HttpError,
+			error,
 			mockRequest as Request,
 			mockResponse as Response,
 			nextFunction
 		);
 		
 
-		expect(mockResponse.status).toHaveBeenCalledWith(400);
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.InternalServerError);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
-		expect(nextFunction).not.toHaveBeenCalledTimes(1);
+		expect(nextFunction).not.toHaveBeenCalled();
 	});
 
 	it('handle unexpected TypeORM errors', async () => {
@@ -72,14 +73,14 @@ describe('TypeORM Error handler middleware', () => {
 		);
 		
 
-		expect(mockResponse.status).toHaveBeenCalledWith(501);
+		expect(mockResponse.status).toHaveBeenCalledWith(HTTP_RESPONSE.InternalServerError);
 		expect(mockResponse.json).toHaveBeenCalledWith(err);
-		expect(nextFunction).not.toHaveBeenCalledTimes(1);
+		expect(nextFunction).not.toHaveBeenCalled();
 	});
 
 	it('do not handle other errors', async () => {
 		handleTypeORMError(
-			new Error('Not a TypeORM error') as HttpError,
+			new Error('Not a TypeORM error'),
 			mockRequest as Request,
 			mockResponse as Response,
 			nextFunction
