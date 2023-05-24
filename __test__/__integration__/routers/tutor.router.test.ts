@@ -60,7 +60,6 @@ describe('Router to signup tutor user', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.created(res, result);
 	});
 
@@ -84,7 +83,6 @@ describe('Router to signup tutor user', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.signUPNotAllowed(res);
 	});
 
@@ -100,7 +98,6 @@ describe('Router to signup tutor user', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 });
@@ -164,7 +161,6 @@ describe('Router to retrieve a tutor by id', () => {
 	const tutors: Tutor[] = [];
 	
 	beforeAll(async () => {
-		console.debug('beforeAll');
 		await cleanDatabase();
 
 		for(const data of generateTutorsData(5)){
@@ -369,7 +365,6 @@ describe('Router to update (put) a tutor by id', () => {
 			}
 		};
 
-		console.debug(pay);
 
 
 		const res = await request(server)
@@ -465,7 +460,6 @@ describe('Router to update (patch) a tutor by id', () => {
 
 		const test = await Tutor.findOneBy({ id: tutor.id});
 
-		console.debug(test);
 
 		const res = await request(server)
 			.patch(`/tutores/${tutor.id}`)
@@ -485,7 +479,6 @@ describe('Router to update (patch) a tutor by id', () => {
 
 		const test = await Tutor.findOneBy({ id: tutor.id});
 
-		console.debug(test);
 
 		const res = await request(server)
 			.patch(`/tutores/${tutor.id}`)
@@ -614,7 +607,6 @@ describe('Router do delete a tutor by id', () => {
 		const res = await request(server)
 			.delete(`/tutores/${tutor.id}`);
 
-		console.debug(res.body);
 		Assertions.unauthenticated(res);
 	});
 
@@ -643,7 +635,6 @@ describe('Router do delete a tutor by id', () => {
 
 		const deletedTutor = await Tutor.getRepository().createQueryBuilder('tutor').withDeleted().leftJoinAndSelect('tutor.user', 'user').where({id: tutor.id}).getOne();
 
-		console.debug(deletedTutor);
 
 		expect(deletedTutor).not.toBeNull();
 		expect(deletedTutor!.delete_date).not.toBeNull();

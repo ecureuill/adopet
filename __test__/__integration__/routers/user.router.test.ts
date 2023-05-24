@@ -76,7 +76,6 @@ describe('Router to signup for admin User', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.signUPNotAllowed(res);
 	});
 
@@ -92,7 +91,6 @@ describe('Router to signup for admin User', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 });
@@ -150,7 +148,6 @@ describe('Router to login', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		expect(res.statusCode).toBe(HTTP_RESPONSE.Unauthorized);
 		expect(res.body['message']).toBe('Invalid credentials');
 	});
@@ -168,7 +165,6 @@ describe('Router to login', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 });
@@ -234,7 +230,6 @@ describe('Retrive users', () => {
 					id: owner? user.id : randomUUID()
 				})}`);
 
-			console.debug(res.body);
 			Assertions.retrieveEntity(res, user);
 		});
 
@@ -243,13 +238,10 @@ describe('Retrive users', () => {
 				.get(`/users/${randomUUID()}`)
 				.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
 
-			console.debug(res.body);
 			Assertions.nonExistentId(res);
 		});
 
 		it('responds UNAUTHORIZED when unauthenticated user get /user:id', async () => {
-			console.debug('user.id');
-			console.debug(user.id);
 			const res = await request(server)
 				.get(`/users/${user.id}`);
 		
@@ -264,7 +256,6 @@ describe('Retrive users', () => {
 				.get(`/users/${user.id}`)
 				.set('Authorization', `Bearer ${generateToken({role: role})}`);
 
-			console.debug(res.body);
 			Assertions.restrictedToOwner(res);
 		});
 	});
@@ -294,7 +285,6 @@ describe('Router to update (put) user', () => {
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`)
 			.send(payload);
 
-		console.debug(res.body);
 		Assertions.putUserDone(res, payload);
 	});
 
@@ -304,7 +294,6 @@ describe('Router to update (put) user', () => {
 			.put(`/users/${payload.id}`)
 			.send(payload);
 
-		console.debug(res.body);
 		Assertions.unauthenticated(res);
 	});
 	
@@ -315,7 +304,6 @@ describe('Router to update (put) user', () => {
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`)
 			.send(payload);
 
-		console.debug(res.body);
 		Assertions.nonExistentId;
 	});
 
@@ -331,7 +319,6 @@ describe('Router to update (put) user', () => {
 				maybe: true
 			});
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 
@@ -438,7 +425,6 @@ describe('Router to update (patch) user', () => {
 			.set('Authorization', `Bearer ${generateToken({id: user.id, role: role})}`)
 			.send(payload);
 
-		console.debug(res.body);
 		Assertions.patchUserDone(res, user, payload as User);
 	});
 
@@ -454,7 +440,6 @@ describe('Router to update (patch) user', () => {
 			.set('Authorization', `Bearer ${generateToken({id: user.id, role: role})}`)
 			.send(payload);
 
-		console.debug(res.body);
 		Assertions.notAllowedPropertyUpdate(res);
 	});
 	
@@ -469,7 +454,6 @@ describe('Router to update (patch) user', () => {
 				maybe: true
 			});
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 
@@ -515,7 +499,6 @@ describe('Router to update (patch) user', () => {
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`)
 			.send(user);
 
-		console.debug(res.body);
 		Assertions.nonExistentId(res);
 	});
 });
@@ -535,7 +518,6 @@ describe('Router to delete user', () => {
 	it('responds UNAUTHORIZED when unauthenticated-user delete /users/:id', async () => {
 		const res = await request(server).delete(`/users/${user.id}`);
 
-		console.debug(res.body);
 		Assertions.unauthenticated(res);
 	});
 
@@ -548,7 +530,6 @@ describe('Router to delete user', () => {
 		const res = await request(server)
 			.delete(`/users/${user.id}`)
 			.set('Authorization', `Bearer ${token}`);
-		console.debug(res.body);
 		Assertions.notAllowedRole(res);
 	});
 
@@ -562,7 +543,6 @@ describe('Router to delete user', () => {
 			.delete(`/users/${user.id}`)
 			.set('Authorization', `Bearer ${token}`);
 
-		console.debug(res.body);
 		Assertions.notAllowedRole(res);
 	});
 
@@ -570,7 +550,6 @@ describe('Router to delete user', () => {
 		const res = await request(server)
 			.delete(`/users/${user.id}`)
 			.set('Authorization', `Bearer ${generateToken({role: role})}`);
-		console.debug(res.body);
 		Assertions.notAllowedRole(res);
 	});
 
@@ -579,7 +558,6 @@ describe('Router to delete user', () => {
 			.delete(`/users/${user.id}`)
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
 
-		console.debug(res.body);
 		Assertions.delete(res);
 	});
 
@@ -591,7 +569,6 @@ describe('Router to delete user', () => {
 			.delete(`/users/${user.id}`)
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
 
-		console.debug(res.body);
 		Assertions.nonExistentId(res);
 	});
 });

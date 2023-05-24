@@ -364,7 +364,6 @@ describe('Router to update a pet by id', () => {
 
 		it('responds BADREQUEST When a user patch /pets/:id with replaced shelterId', async () => {
 			
-			console.debug(pet.id);
 			const res = await request(server)
 				.patch(`/pets/${pet.id}`)
 				.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`)
@@ -416,7 +415,6 @@ describe('Router do delete a pet by id', () => {
 		const res = await request(server)
 			.delete(`/pets/${pet.id}`);
 
-		console.debug(res.body);
 		Assertions.unauthenticated(res);
 	});
 
@@ -469,7 +467,6 @@ describe('Router do delete a pet by id', () => {
 			.delete(`/pets/${pet.id}`)
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
 
-		console.debug(res.body);
 		Assertions.nonExistentId(res);
 
 	});
@@ -478,7 +475,6 @@ describe('Router do delete a pet by id', () => {
 			.delete(`/pets/${randomUUID()}`)
 			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
 
-		console.debug(res.body);
 		Assertions.nonExistentId(res);
 	});
 });

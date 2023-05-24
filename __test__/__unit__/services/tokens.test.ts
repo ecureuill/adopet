@@ -15,7 +15,6 @@ describe('jwt tokens', () => {
 			role: Role.ADMIN,	
 		};
 		token = createJwtToken(payload);
-		console.debug(payload);
 	});
 	
 	it('create valid token with payload', () => {

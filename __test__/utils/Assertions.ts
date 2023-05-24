@@ -437,7 +437,7 @@ export class Assertions {
 				const K = key as keyof I;
 				// if(!['create_date', 'update_date', 'delete_date'].includes(K as string))
 				// {		
-				console.log(K);
+				// console.log(K);
 				const payLValue = payload[K];
 				if(payLValue === undefined)
 					expect(current[key as keyof I]).toEqual(before[K]);

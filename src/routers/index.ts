@@ -53,10 +53,10 @@ router.post('/signup/abrigos/',
 );
 
 router.all('*', 
-	(request: Request, response: Response, next: NextFunction) => {
-		console.debug(request.params);
-		next();
-	},
+	// (request: Request, response: Response, next: NextFunction) => {
+	// 	// console.debug(request.params);
+	// 	next();
+	// },
 	JWTVerify,
 );
 

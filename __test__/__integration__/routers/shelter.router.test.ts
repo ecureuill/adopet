@@ -62,7 +62,6 @@ describe('Router to signup shelter', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.created(res, result);
 	});
 
@@ -86,7 +85,6 @@ describe('Router to signup shelter', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.signUPNotAllowed(res);
 	});
 
@@ -102,7 +100,6 @@ describe('Router to signup shelter', () => {
 			.set('Content-Type', 'application/json')
 			.set('Accept', 'application/json');
 
-		console.debug(res.body);
 		Assertions.jsonSchemaError(res);
 	});
 
@@ -254,8 +251,6 @@ describe('Router to update (put) a shelter by id', () => {
 
 		Assertions.putShelterDone(res, payload);
 		
-		console.debug(res.body.pets);
-		console.debug(shelter.pets);
 		expect(res.body.pets.length).toBe(4);
 
 		//altered existed pet
@@ -386,9 +381,7 @@ describe('Router to update (put) a shelter by id', () => {
 
 	it('responds BADREQUEST When user put /abrigos/:id with replaced pet.shelterId', async () => {
 
-		console.debug(payload.pets);
 		payload.pets[2].shelterId = randomUUID();
-		console.debug(payload.pets);
 
 		const res = await request(server)
 			.put(`/abrigos/${shelter.id}`)
@@ -509,7 +502,6 @@ describe('Router to update (patch) a shelter by id', () => {
 	test.each(casesOnlyPermitteds)('responds OK when shelter-user owner of resource patch /abrigos/:id with permitted property %s', async (key, payload) => {
 		if(payload?.pets !== undefined)
 			payload.pets[0].id = shelter.pets[0].id;
-		console.debug(payload);
 
 		const res = await request(server)
 			.patch(`/abrigos/${shelter.id}`)
@@ -540,7 +532,6 @@ describe('Router to update (patch) a shelter by id', () => {
 		if(payload.userId !== undefined && payload.userId === null)
 			payload.userId = shelter.userId;
 		
-		console.debug(payload);
 		const res = await request(server)
 			.patch(`/abrigos/${shelter.id}`)
 			.set('Authorization', `Bearer ${generateToken({id: shelter.userId, role: Role.SHELTER})}`)

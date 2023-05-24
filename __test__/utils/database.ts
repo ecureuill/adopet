@@ -13,7 +13,6 @@ export const cleanDatabase = async () => {
 		const tableNames = entities.map((entity) => `"${entity.tableName}"`).join(', ');
 
 		await  dataSource.query(`TRUNCATE ${tableNames} CASCADE;`);
-		console.log('[TEST DATABASE]: Clean');
 	} catch (error) {
 		throw new Error(`ERROR: Cleaning test database: ${error}`);
 	}
@@ -54,7 +53,6 @@ export const seedDatabase = async () => {
 
 		await tutor.save();
 
-		console.log('[TEST DATABASE]: Seed');
 	}
 	catch (error) {
 		throw new Error(`ERROR: Seeding test database: ${error}`);
@@ -77,11 +75,7 @@ export const seedDataBaseTutors = async (count = 3) => {
 
 		tutor = await tutor.save();
 
-		console.log('[TEST DATABASE]: Seed Tutor');
-		console.log(tutor);
 		tutors.push(tutor.id);
-		console.debug(tutor.id);
-		console.debug(tutors);
 	}
 
 	return tutors;
@@ -104,11 +98,7 @@ export const seedDataBaseShelters = async (count = 3) => {
 
 		shelter = await shelter.save();
 
-		console.log('[TEST DATABASE]: Seed Shelter');
-		console.log(shelter);
 		shelters.push(shelter.id);
-		console.debug(shelter.id);
-		console.debug(shelters);
 	}
 
 	return shelters;
@@ -133,7 +123,6 @@ export const seedDataBasePets = async (count = 3) => {
 	}
 		
 	shelter = await shelter.save();
-	console.log('[TEST DATABASE]: Seed Pets');
 
 	return shelter.pets.map(p => p.id);
 };
@@ -217,4 +206,47 @@ export const saveShelter = async (shelter: Shelter) => {
 	await newShelter.save();
 
 	return newShelter;
+};
+
+export const saveAdoption = async (adoption: Adoption) => {
+	const {tutor, pet, ...expected} = adoption;
+	const {user, ...expectedTutor} = tutor;
+
+	const newUser = new User(user);
+	await newUser.save();
+
+	const newTutor = new Tutor();
+	Object.assign(newTutor, expectedTutor);
+	await newTutor.save();
+
+	const newPet = new Pet();
+	Object.assign(newPet, pet);
+	const shelter = await saveShelter(generateShelterData({}, true, 0) as Shelter);
+	shelter.pets.push(newPet);
+	await shelter.save();
+
+	newTutor.user = newUser;
+	await newTutor.save();
+
+	const newAdoption = new Adoption();
+	newAdoption.tutor = newTutor;
+	newAdoption.pet = newPet;
+	newAdoption.shelterId = shelter.id;
+
+	return await newAdoption.save();
+};
+
+export const saveTutor = async (tutor: Tutor) => {
+	const {user, ...expected} = tutor;
+
+	const newUser = new User(user);
+	await newUser.save();
+
+	const newTutor = new Tutor();
+	Object.assign(newTutor, expected);
+
+	newTutor.user = newUser;
+	await newTutor.save();
+
+	return newTutor;
 };

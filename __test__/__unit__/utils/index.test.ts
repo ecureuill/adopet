@@ -138,8 +138,6 @@ describe('assignProperties function', () => {
 	it('should add all attributes to shelter and keep older pets', () => {
 
 		const body = generateShelterData();
-		console.debug(body);
-
 		const shelter: IShelter = {
 			id: body.id,
 			userId: body.userId,
@@ -157,8 +155,6 @@ describe('assignProperties function', () => {
 			}
 
 		};
-
-		console.debug(shelter);
 
 		assignProperties(body, shelter);
 
