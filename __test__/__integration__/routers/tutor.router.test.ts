@@ -135,7 +135,7 @@ describe('Router to retrieve tutors', () => {
 			.get('/tutores')
 			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR })}`);
 
-		Assertions.retrieveRestrictedListOwnedEntities(res, [tutor]);
+		Assertions.retrieveRestrictedListOwnedEntities(res, [tutor], true);
 	});
 
 	it('responds UNAUTHORIZED when unauthenticated-user get /tutores', async () => {

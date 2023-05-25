@@ -1,12 +1,10 @@
 import { randomUUID } from 'crypto';
 import PetController from '../../../src/controller/pet.controller';
 import { Pet } from '../../../src/entities/Pet';
-import { Shelter } from '../../../src/entities/Shelter';
 import * as validations from '../../../src/services/validations';
 import { Role } from '../../../src/types/enums';
 import { IUserSettings } from '../../../src/types/interfaces';
 import { generatePetData, generateShelterData } from '../../utils/generate';
-import createHttpError from 'http-errors';
 import Controller from '../../../src/controller';
 import { getMockRepository } from '../../utils/mocks';
 import { EntityNotFoundError } from 'typeorm';
@@ -19,7 +17,7 @@ describe('Pet Controller', () => {
 	let getRepository: jest.SpyInstance;
 	let findOneByOrFail: jest.SpyInstance;
 	let superController: jest.SpyInstance;
-	// let idReplacememtIsNotAllowed: jest.SpyInstance;
+
 	beforeEach(() => {
 		settings = {
 			authenticated: false,

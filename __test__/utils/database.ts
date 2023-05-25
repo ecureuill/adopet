@@ -1,11 +1,12 @@
 import { dataSource } from '../../src/database/datasource/data-source';
+import { Adoption } from '../../src/entities/Adoption';
 import { Pet } from '../../src/entities/Pet';
 import { Shelter } from '../../src/entities/Shelter';
 import { Tutor } from '../../src/entities/Tutor';
 import { User } from '../../src/entities/User';
 import { Role } from '../../src/types/enums';
-import { IPet, IUser } from '../../src/types/schemas';
-import { generatePetData } from './generate';
+import { IUser } from '../../src/types/schemas';
+import { generatePetData, generateShelterData, generateUserData } from './generate';
 
 export const cleanDatabase = async () => {
 	try {
@@ -208,30 +209,42 @@ export const saveShelter = async (shelter: Shelter) => {
 	return newShelter;
 };
 
-export const saveAdoption = async (adoption: Adoption) => {
-	const {tutor, pet, ...expected} = adoption;
-	const {user, ...expectedTutor} = tutor;
+export const saveAdoption = async (adoption: Adoption, args:{
+	tutor?: Tutor,
+	shelter?: Shelter,
+	pet?: Pet,
+	user?: User
+} = {}) => {
+	const {tutor: fkTutor, pet: fkPet} = adoption;
 
-	const newUser = new User(user);
-	await newUser.save();
+	if(args.tutor === undefined){
+		if(args.user === undefined){
+			args.user = new User(generateUserData());
+			await args.user.save();
+		}
 
-	const newTutor = new Tutor();
-	Object.assign(newTutor, expectedTutor);
-	await newTutor.save();
+		args.tutor = new Tutor();
+		Object.assign(args.tutor, fkTutor);
+		args.tutor.user = args.user;
+		args.tutor.userId = args.user.id;
+		await args.tutor.save();
+	}
 
-	const newPet = new Pet();
-	Object.assign(newPet, pet);
-	const shelter = await saveShelter(generateShelterData({}, true, 0) as Shelter);
-	shelter.pets.push(newPet);
-	await shelter.save();
-
-	newTutor.user = newUser;
-	await newTutor.save();
+	if(args.pet === undefined){
+		args.pet = new Pet();
+		Object.assign(args.pet, fkPet);
+		
+		if(args.shelter === undefined){
+			args.shelter = await saveShelter(generateShelterData({}, true, 0) as Shelter);
+		}
+		args.shelter.pets.push(args.pet);
+		await args.shelter.save();
+	}
 
 	const newAdoption = new Adoption();
-	newAdoption.tutor = newTutor;
-	newAdoption.pet = newPet;
-	newAdoption.shelterId = shelter.id;
+	newAdoption.tutor = args.tutor;
+	newAdoption.pet = args.pet;
+	newAdoption.shelterId = args.pet.shelterId;
 
 	return await newAdoption.save();
 };

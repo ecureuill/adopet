@@ -948,4 +948,65 @@ describe('schema validation', () => {
 			expect(nextFunction).not.toBeCalled();
 		});
 	});
+
+	describe('adoptionSchema validation', () => {
+		let settings: any;
+
+		beforeEach(() => {
+			settings = {schema: 'adoptionSchema', data: 'body',strictRequiredChecks: true};
+		});
+
+		const required = {
+			petId: randomUUID(),	
+			tutorId: randomUUID(),
+		};
+
+		it('should validate body containing all required properties', () => {
+			mockRequest.body = required;
+
+			expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+			).not.toThrow();
+			expect(nextFunction).toBeCalledTimes(1);
+		});
+
+		test.each([
+			[{petId: randomUUID()}],
+			[{tutorId: randomUUID()}],
+		])('should throw for body without all required properties', (optional) => {
+			mockRequest.body = optional;
+
+			expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+			).toThrow(SCHEMA_ERRORS_CODE.required);
+
+			expect(nextFunction).not.toBeCalledTimes(1);
+		});
+
+		it('should throw for body={} with strictRequiredChecks=false', () => {
+			settings.strictRequiredChecks = false;
+			mockRequest.body = {};
+
+			expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+			).toThrow(SCHEMA_ERRORS_CODE.minProperties);
+			expect(nextFunction).not.toBeCalled();
+		});
+
+		it('should throw for body={} with strictRequiredChecks=true', () => {
+			settings.strictRequiredChecks = true;
+			mockRequest.body = {};
+
+			expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+			).toThrow(SCHEMA_ERRORS_CODE.minProperties);
+			expect(nextFunction).not.toBeCalled();
+		});
+
+		it('should throw for body containing additional properties', () => {
+
+			mockRequest.body = {...required, any: 'any'};
+			
+			expect(() => validator.validate(settings)(mockRequest as Request, mockResponse as Response, nextFunction)
+			).toThrow(SCHEMA_ERRORS_CODE.additionalProperties);
+			
+			expect(nextFunction).not.toBeCalled();
+		});
+	});
 });

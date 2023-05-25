@@ -72,6 +72,21 @@ const loginSchema = {
 	minProperties: 2,
 };
 
+const adoptionSchema = {
+	$id: 'adoptionSchema',
+	type: 'object',
+	required: ['tutorId', 'petId'],
+	properties: {
+		id: { $ref: 'definitionsSchema#/definitions/uuid'},
+		petId: { $ref: 'definitionsSchema#/definitions/uuid'},
+		tutorId: { $ref: 'definitionsSchema#/definitions/uuid'},
+		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+		create_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
+	},
+	additionalProperties: false,
+	minProperties: 1,
+};
+
 const userSchema: JSONSchemaType<IUser> = {
 	$id: 'userSchema',
 	type: 'object',
@@ -173,6 +188,15 @@ export const shelterSchema: JSONSchemaType<IShelter> = {
 	minProperties: 1 //avoid empty body on
 };
 
-const schemas = [definitionsSchema, loginSchema, userSchema, petSchema, tutorSchema, shelterSchema, paramSchema];
+const schemas = [
+	definitionsSchema, 
+	loginSchema, 
+	userSchema, 
+	petSchema, 
+	tutorSchema, 
+	shelterSchema, 
+	paramSchema, 
+	adoptionSchema
+];
 
 export default schemas;

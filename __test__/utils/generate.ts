@@ -4,6 +4,9 @@ import { faker } from '@faker-js/faker/locale/pt_BR';
 import { AgeUnit, PetType, Role, SizeVariety } from '../../src/types/enums';
 import { EnumType } from 'typescript';
 import { createJwtToken } from '../../src/services/tokens';
+import { Adoption } from '../../src/entities/Adoption';
+import { Pet } from '../../src/entities/Pet';
+import { Tutor } from '../../src/entities/Tutor';
 
 export const getRandomEnum = <TEnum> (anEnum: TEnum) => {
 	const enumValues = Object.keys(anEnum as EnumType);
@@ -147,5 +150,51 @@ export const generateSheltersData = (n = 1, overide: {
 } = {shelter: {}, user: {}, pet: {}}): IShelter[] => {
 	return Array.from({length: n},(_, i) => {
 		return generateShelterData(overide);
+	});
+};
+
+export const generateAdoptionData = (overide: {
+	pet?: Partial<IPet>,
+	tutor?: Partial<ITutor>,
+	adoption?: object
+} = {
+	pet: {},
+	tutor: {},
+	adoption: {}
+}, includeSensitive = true) : Partial<Adoption> => {
+	const pet = generatePetData({adopted: true, ...overide.pet},includeSensitive) as Pet;
+	const tutor = generateTutorData({ tutor: overide.tutor }, includeSensitive) as Tutor;
+
+	if(includeSensitive)
+		return {
+			id: randomUUID(),
+			tutorId: tutor.id,
+			petId: pet.id,
+			pet: pet,
+			tutor: tutor,
+			create_date: faker.date.recent().toISOString(),
+			delete_date: null,
+			...overide.adoption,
+		};
+	return {
+		pet: pet,
+		tutor: tutor,
+		create_date: faker.date.recent().toISOString(),
+		delete_date: null,
+		...overide.adoption,
+	};
+};
+
+export const generateAdoptionsData = (n = 1, overide: {
+	pet?: Partial<IPet>,
+	tutor?: Partial<ITutor>,
+	adoption?: object
+} = {
+	pet: {},
+	tutor: {},
+	adoption: {}
+}, includeSensitive = true): Array<Partial<Adoption>> => {
+	return Array.from({length: n},(_, i) => {
+		return generateAdoptionData(overide, includeSensitive);
 	});
 };

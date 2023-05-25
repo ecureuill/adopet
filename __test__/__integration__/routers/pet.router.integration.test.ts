@@ -28,17 +28,16 @@ afterAll(() => {
 });
 
 describe('Router to retrieve pets', () => {
-	const pets = Array<Pet>();
+	let pets = Array<Pet>();
 
 	beforeAll(async () => {
 		await cleanDatabase();
 
-		for(const item of generateSheltersData(5)){
+		for(const item of generateSheltersData(5, { shelter: {delete_date: null}, pet: {delete_date: null}, user: {delete_date: null} })){
 			const shelter = await saveShelter(Object.assign(new Shelter(), item));
-			await shelter.save();
-			pets.push(...shelter.pets);
 		}
 
+		pets = await Pet.find({relations: {shelter: true}});
 	});
 
 	describe('All pets', () => {
@@ -52,8 +51,10 @@ describe('Router to retrieve pets', () => {
 			const res = await request(server)
 				.get('/pets')
 				.set('Authorization', `Bearer ${generateToken({role: role})}`);
+			
 			Assertions.retrieveCompleteListEntities(res, pets, role !== Role.ADMIN);
 		});
+
 		it('responds OK and body should have a list of pets when unauthenticated-user get /pets', async () => {
 
 			const res = await request(server)

@@ -11,6 +11,7 @@ export const Resources = {
 	SHELTER: 'shelter',
 	TUTOR: 'tutor',
 	USER: 'user',
+	ADOPTION: 'adoption',
 } as const;
 
 export const USER_NOT_AUTHENTICATED = {

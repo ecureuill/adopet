@@ -136,6 +136,8 @@ describe('getPermission', () => {
 		expect(getPermission(Resources.TUTOR)).toMatchObject(permissions.tutor.permissions);
 
 		expect(getPermission(Resources.USER)).toMatchObject(permissions.user.permissions);
+
+		expect(getPermission(Resources.ADOPTION)).toMatchObject(permissions.adoption.permissions);
 	});
 
 	it('should throw for non-existent permission', () => {

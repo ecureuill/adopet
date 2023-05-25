@@ -9,6 +9,7 @@ import UserRouter from './user.router';
 import { JWTVerify } from '../middlewares/jwt-middleware';
 import validatePermissions from '../middlewares/authorization-middleware';
 import { Resources, Actions } from '../utils/consts';
+import AdoptionRouter from './adoption.router';
 
 export const router = Router();
 
@@ -16,6 +17,7 @@ const tutorRouter = new TutorRouter();
 const shelterRouter = new ShelterRouter();
 const petRouter = new PetRouter();
 const userRouter = new UserRouter();
+const adoptionRouter = new AdoptionRouter();
 
 const validator = new SchemaValidator(schemas);
 
@@ -127,6 +129,29 @@ router.patch(`/abrigos/:id(${uuidRegex})`,
 router.delete(`/abrigos/:id(${uuidRegex})`, 
 	validatePermissions(Resources.SHELTER, Actions.DELETE), 
 	asyncHandler(shelterRouter.delete)
+);
+
+router.get('/adocoes',
+	validatePermissions(Resources.ADOPTION, Actions.READ),
+	asyncHandler(adoptionRouter.getAll)
+);
+router.get(`/adocoes/:id(${uuidRegex})`,
+	validatePermissions(Resources.ADOPTION, Actions.READ),
+	asyncHandler(adoptionRouter.getOneById)
+);
+router.post('/adocoes', 
+	validatePermissions(Resources.ADOPTION, Actions.CREATE), 
+	validator.validate({schema: 'adoptionSchema', data: 'body'}),
+	asyncHandler(adoptionRouter.create)
+);
+router.post(`/adocoes/:id(${uuidRegex})`, 
+	validatePermissions(Resources.ADOPTION, Actions.CREATE), 
+	validator.validate({schema: 'adoptionSchema', data: 'body'}),
+	asyncHandler(adoptionRouter.create)
+);
+router.delete(`/adocoes/:id(${uuidRegex})`, 
+	validatePermissions(Resources.ADOPTION, Actions.DELETE), 
+	asyncHandler(adoptionRouter.delete)
 );
 
 router.get('/pets', 

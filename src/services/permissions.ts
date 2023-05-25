@@ -201,7 +201,45 @@ const userPermission: IRule = {
 	]
 };
 
-export const permissions = {pet: petPermission, tutor: tutorPermission, shelter: shelterPermission, user: userPermission};
+const adoptionPermission: IRule = {
+	resource: Resources.ADOPTION,
+	permissions: [
+		{
+			action: Actions.READ,
+			roles: [Role.ADMIN],
+			ownership: false,
+			attributes: {
+				excluded: []
+			}
+		},
+		{
+			action: Actions.READ,
+			roles: [Role.SHELTER],
+			ownership: true,
+			attributes: {
+				excluded: []
+			}
+		},
+		{
+			action: Actions.DELETE,
+			roles: [Role.SHELTER],
+			ownership: true,
+			attributes: {
+				excluded: []
+			}
+		},
+		{
+			action: Actions.CREATE,
+			roles: [Role.SHELTER],
+			ownership: true,
+			attributes: {
+				excluded: []
+			}
+		}
+	]
+};
+
+export const permissions = {pet: petPermission, tutor: tutorPermission, shelter: shelterPermission, user: userPermission, adoption: adoptionPermission};
 
 export const getPermission = (resource: Resource) => {
 	switch (resource){
@@ -213,6 +251,8 @@ export const getPermission = (resource: Resource) => {
 		return tutorPermission.permissions;
 	case 'user':
 		return userPermission.permissions;
+	case 'adoption':
+		return adoptionPermission.permissions;
 	default:
 		throw new MisconfiguredError('Permission rules');
 	}

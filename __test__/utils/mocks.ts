@@ -82,7 +82,18 @@ export const getMockRepository = (...options: mockOptions[]) => {
 			}),
 			remove: jest.fn().mockImplementation((entity: any) => {
 				return entity;
-			})
+			}),
+			manager:  jest.fn().mockImplementation(() => {
+				const original = jest.requireActual('typeorm');
+				return {
+					...original.manager,
+					transaction: jest.fn().mockImplementation(() => {
+						return {
+							save: jest.fn()
+						};
+					}),
+				};
+			}),
 		};
 	});
 };

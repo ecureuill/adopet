@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { HTTP_RESPONSE } from '../../../../src/utils/consts';
 import BaseError from '../../../../src/utils/errors/BaseError';
-import { IdReplacementError, NotOwnerError, SignInLoginError, SignUPEmailError } from '../../../../src/utils/errors/business.errors';
+import { AdoptionError, IdReplacementError, NotOwnerError, SignInLoginError, SignUPEmailError } from '../../../../src/utils/errors/business.errors';
 import { MisconfiguredError, MisconfiguredSchemaError, NotImplementedError } from '../../../../src/utils/errors/code.errors';
 import { BadRequestError, ForbiddenError, MethodNotAllowedError, PatchPropertyAllowedError } from '../../../../src/utils/errors/http.errors';
 
@@ -14,6 +14,7 @@ describe('BaseError errors', () => {
 		['SignUPEmailError', SignUPEmailError, 'Email already exist', HTTP_RESPONSE.BadRequest],
 		['SignInLoginError', SignInLoginError, 'Invalid credentials', HTTP_RESPONSE.Unauthorized],
 		['NotImplementedError', NotImplementedError, 'Not implemented!', HTTP_RESPONSE.InternalServerError],
+		['AdoptionError', AdoptionError, 'Pet already adopted', HTTP_RESPONSE.BadRequest],
 	])('Should be an instance of %s', (key, errorClass, message, statusCode) => {
 		const error = new errorClass(message);
 		expect(error).toBeInstanceOf(errorClass);

@@ -46,3 +46,15 @@ export class SignInLoginError extends BaseError{
 	}
 	
 }
+
+export class AdoptionError extends BaseError{
+	
+	constructor(){
+		super('Pet already adopted');
+
+		this.name = 'AdoptionError';
+		this.statusCode = HTTP_RESPONSE.BadRequest;
+		Object.setPrototypeOf(this, AdoptionError.prototype);
+	}
+	
+}
