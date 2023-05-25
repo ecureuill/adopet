@@ -4,7 +4,10 @@ import AdoptionController from '../controller/adoption.controller';
 export default class AdoptionRouter {
 	async getAll(request: Request, response: Response){
 		const controller = new AdoptionController(response.locals.user);
-		const result = await controller.getAll();
+		
+		const { page } = request.query;
+		
+		const result = await controller.getAll(Number(page));
 
 		if(result.count === 0)
 			return response.status(200).json({mensagem: 'Não encontrado'});

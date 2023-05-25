@@ -1,16 +1,21 @@
 import { Response } from 'supertest';
-import { normalizeEntities, normalizeEntity, removeSensity } from '.';
+import { normalizeEntity, removeSensity } from '.';
 import { Pet } from '../../src/entities/Pet';
 import { Shelter } from '../../src/entities/Shelter';
-import { Tutor } from '../../src/entities/Tutor';
 import { User } from '../../src/entities/User';
 import { passwordCompareHash } from '../../src/services/passwords';
 import { IPet, IShelter, ITutor, IUser } from '../../src/types/schemas';
 import { HTTP_RESPONSE } from './consts';
 import { Adoption } from '../../src/entities/Adoption';
+import { PAGINATION } from '../../src/config';
 
 export class Assertions { 
 
+	static internalServerError(res: Response){
+		expect(res.body).toBe(HTTP_RESPONSE.InternalServerError);
+		expect(res.statusCode).toBe(HTTP_RESPONSE.InternalServerError);
+	}
+	
 	static signUPNotAllowed(res: Response){
 		expect(res.body.message).toBe('Email already exist');
 		expect(res.statusCode).toBe(HTTP_RESPONSE.BadRequest);
@@ -68,30 +73,20 @@ export class Assertions {
 		expect(res.get('Content-Type')).toContain('application/json');
 	}
 
-	static retrieveCompleteListEntities(res: Response, entities: object[], isRemoveSensitive = false){
+	static retrieveCompleteListEntities(res: Response, entities: object[], isRemoveSensitive = false, page = 1){
 		
 		this.doneOK(res);
-		
-		expect(res.body.count).toEqual(entities.length);
-		expect(res.body.entities).toBeInstanceOf(Array);
-		expect((res.body.entities as Array<object>).length).toBe(res.body.count);
 
-		this.matchEntities(res.body.entities, entities, isRemoveSensitive);
+		this.pagination(res.body.entities.length, res.body.count, entities.length, page);
 	}
 
-	static retrieveRestrictedListOwnedEntities(res: Response, entities: object[], isRemoveSensitive = false){
+	static retrieveRestrictedListOwnedEntities(res: Response, entities: object[], isRemoveSensitive = false, page = 1){
 		this.doneOK(res);
-		
-		expect((res.body.entities as Array<object>).length).toEqual(entities.length);	
-		expect(res.body.count).toEqual(entities.length);
-		expect(res.body.entities).toBeInstanceOf(Array);
-
-		this.matchEntities(res.body.entities, entities, isRemoveSensitive);
+		this.pagination(res.body.entities.length, res.body.count, entities.length, page);
 	}
 
 	static retrieveEntity(res: Response, entity: object, isRemoveSensitive = false){
 		this.doneOK(res);
-
 		this.matchEntity(res.body, entity, isRemoveSensitive);
 	}
 
@@ -598,5 +593,17 @@ export class Assertions {
 				// }
 			});
 	}
+	
+	private static pagination(listedEntities: number, count: number, expectedCount: number, page: number){
 
+		const totalPages = expectedCount <= PAGINATION? 1 :Math.ceil(expectedCount / PAGINATION);
+		expect(count).toEqual(expectedCount);
+		
+		if(page > totalPages)
+			expect(listedEntities).toEqual(0);
+		else if(page === totalPages)
+			expect(listedEntities).toEqual((expectedCount - (totalPages -1) * PAGINATION));
+		else
+			expect(listedEntities).toEqual(PAGINATION);
+	}
 }

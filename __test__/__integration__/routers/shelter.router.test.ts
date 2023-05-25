@@ -111,13 +111,12 @@ describe('Router to retrieve shelters', () => {
 	beforeAll(async () => {
 		await cleanDatabase();
 
-		for(const item of generateSheltersData(5, {
+		for(const item of generateSheltersData(35, {
 			shelter: {delete_date: null, inactive: false},
 			pet: {delete_date: null},
 			user: {delete_date: null},
 		})){
 			const shelter = await saveShelter(Object.assign(new Shelter(), item));
-			await shelter.save();
 			shelters.push(shelter);
 		}
 
@@ -154,6 +153,21 @@ describe('Router to retrieve shelters', () => {
 
 		Assertions.retrieveCompleteListEntities(res, shelters, true);
 	});
+
+	test.each([
+		[0], // 1
+		[1],
+		[2],
+		[3],
+		[4],
+		[5],
+	])('responds OK and body should have paginated list when get /abrigos?page=%s', async (page) => {
+		const res = await request(server)
+			.get(`/abrigos?page=${page}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
+
+		Assertions.retrieveCompleteListEntities(res, shelters, true, page);
+	});
 });
 
 describe('Router to retrieve a shelter by id', () => {
@@ -178,19 +192,19 @@ describe('Router to retrieve a shelter by id', () => {
 	];
 	test.each(cases)('responds OK and body should have one shelter when %s get /abrigos/:id', async (key, token, removeSensitiveProperty) => {
 		
-		const shelter: Shelter = Object.assign(new Shelter(), generateShelterData());
+		const shelter: Shelter = Object.assign(new Shelter(), generateShelterData({shelter: {delete_date: null}, pet:{delete_date: null, adopted: false}}));
 
 		const expected = await saveShelter(shelter);
-		
+
 		let res;
 		if(token === undefined)
 		{
 			res = await request(server)
-				.get(`/abrigos/${shelter.id}`);
+				.get(`/abrigos/${expected.id}`);
 		}
 		else
 			res = await request(server)
-				.get(`/abrigos/${shelter.id}`)
+				.get(`/abrigos/${expected.id}`)
 				.set('Authorization', `Bearer ${token}`);
 
 		Assertions.retrieveEntity(res, expected, removeSensitiveProperty as boolean);

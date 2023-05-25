@@ -33,7 +33,7 @@ describe('Router to retrieve pets', () => {
 	beforeAll(async () => {
 		await cleanDatabase();
 
-		for(const item of generateSheltersData(5, { shelter: {delete_date: null}, pet: {delete_date: null}, user: {delete_date: null} })){
+		for(const item of generateSheltersData(35, { shelter: {delete_date: null}, pet: {delete_date: null}, user: {delete_date: null} })){
 			const shelter = await saveShelter(Object.assign(new Shelter(), item));
 		}
 
@@ -61,6 +61,21 @@ describe('Router to retrieve pets', () => {
 				.get('/pets');
 
 			Assertions.retrieveCompleteListEntities(res, pets, true);
+		});
+
+		test.each([
+			[0], // 1
+			[1],
+			[2],
+			[3],
+			[4],
+			[5],
+		])('responds OK and body should have paginated list when get /pets?page=%s', async (page) => {
+			const res = await request(server)
+				.get(`/pets?page=${page}`)
+				.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
+
+			Assertions.retrieveCompleteListEntities(res, pets, true, page);
 		});
 	});
 

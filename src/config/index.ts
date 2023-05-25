@@ -31,3 +31,5 @@ export const jwtSignOptions: SignOptions = {
 export const jwtVerifyOptions: VerifyOptions = {
 	algorithms: ['HS256'],
 };
+
+export const PAGINATION = 10;

@@ -6,7 +6,10 @@ import { Tutor } from '../entities/Tutor';
 export default class TutorRouter {
 	async getAll(request: Request, response: Response){
 		const controller = new TutorController(response.locals.user);
-		const result = await controller.getAll();
+		
+		const { page } = request.query;
+
+		const result = await controller.getAll(Number(page));
 
 		if(result.count === 0)
 			return response.status(200).json({mensagem: 'Não encontrado'});

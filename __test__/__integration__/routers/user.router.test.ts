@@ -175,9 +175,10 @@ describe('Retrive users', () => {
 	beforeAll(async () => {
 		await cleanDatabase();
 		
-		users.push(...(generateUsersData(5, {role: Role.ADMIN, delete_date: null}) as User[]));
+		users.push(...(generateUsersData(2, {role: Role.ADMIN, delete_date: null}) as User[]));
 		users.push(...(generateUsersData(2, {role: Role.TUTOR, delete_date: null}) as User[]));
 		users.push(...(generateUsersData(2, {role: Role.SHELTER, delete_date: null}) as User[]));
+		users.push(...(generateUsersData(30, {delete_date: null}) as User[]));
 		
 		for(const user of users)
 			await new User(user).save();
@@ -203,6 +204,21 @@ describe('Retrive users', () => {
 				.set('Authorization', `Bearer ${generateToken({id:filteredUsers[0].id, role: role})}`);
 
 			Assertions.retrieveRestrictedListOwnedEntities(res, [filteredUsers[0]]);
+		});
+
+		test.each([
+			[0], // 1
+			[1],
+			[2],
+			[3],
+			[4],
+			[5],
+		])('responds OK and body should have paginated list when get /users?page=%s', async (page) => {
+			const res = await request(server)
+				.get(`/users?page=${page}`)
+				.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
+
+			Assertions.retrieveCompleteListEntities(res, users, true, page);
 		});
 
 		it('responds UNAUTHORIZED to get /users when unauthenticated', async () => {
@@ -259,6 +275,7 @@ describe('Retrive users', () => {
 			Assertions.restrictedToOwner(res);
 		});
 	});
+
 });
 
 describe('Router to update (put) user', () => {

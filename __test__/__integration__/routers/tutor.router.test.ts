@@ -4,7 +4,7 @@ import request from 'supertest';
 
 import { findTutorUserAndCreateToken } from '../../utils';
 import { Assertions } from '../../utils/Assertions';
-import { cleanDatabase } from '../../utils/database';
+import { cleanDatabase, saveTutor } from '../../utils/database';
 
 import { faker } from '@faker-js/faker/locale/pt_BR';
 import { closeConnection, openConnection } from '../../../src/database/datasource/data-source';
@@ -108,13 +108,10 @@ describe('Router to retrieve tutors', () => {
 	beforeAll(async () => {
 		await cleanDatabase();
 
-		for(const user of generateTutorsData(5)){
-			const tutor = new Tutor();
-			Object.assign(tutor, user);
-			await tutor.save();
-			users.push(tutor);
+		for(const user of generateTutorsData(34)){
+			await saveTutor(user as Tutor);
+			users.push(user as Tutor);
 		}
-
 	});
 
 	it('responds OK and body should have a list of tutors when admin user get /tutores', async () => {
@@ -136,6 +133,21 @@ describe('Router to retrieve tutors', () => {
 			.set('Authorization', `Bearer ${generateToken({id: tutor.userId, role: Role.TUTOR })}`);
 
 		Assertions.retrieveRestrictedListOwnedEntities(res, [tutor], true);
+	});
+
+	test.each([
+		[0], // 1
+		[1],
+		[2],
+		[3],
+		[4],
+		[5],
+	])('responds OK and body should have paginated list when get /tutores?page=%s', async (page) => {
+		const res = await request(server)
+			.get(`/tutores?page=${page}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
+
+		Assertions.retrieveCompleteListEntities(res, users, true, page);
 	});
 
 	it('responds UNAUTHORIZED when unauthenticated-user get /tutores', async () => {

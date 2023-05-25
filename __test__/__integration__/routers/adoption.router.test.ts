@@ -265,7 +265,7 @@ describe('Router to retrieve adoptions', () => {
 	beforeAll(async () => {
 		await cleanDatabase();
 
-		for(let adopt of generateAdoptionsData(5)){
+		for(let adopt of generateAdoptionsData(35)){
 			adopt = await saveAdoption(adopt as Adoption);
 			(adopt.tutor as Partial<Tutor>).user = undefined;
 			allAdoptions.push(adopt as Adoption);
@@ -332,6 +332,21 @@ describe('Router to retrieve adoptions', () => {
 			.get('/adocoes');
 
 		Assertions.unauthenticated(res);
+	});
+
+	test.each([
+		[0], // 1
+		[1],
+		[2],
+		[3],
+		[4],
+		[5],
+	])('responds OK and body should have paginated list when get /adocoes?page=%s', async (page) => {
+		const res = await request(server)
+			.get(`/adocoes?page=${page}`)
+			.set('Authorization', `Bearer ${generateToken({role: Role.ADMIN})}`);
+
+		Assertions.retrieveCompleteListEntities(res, allAdoptions, true, page);
 	});
 });
 

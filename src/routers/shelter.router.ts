@@ -5,7 +5,10 @@ import ShelterController from '../controller/shelter.controller';
 export default class ShelterRouter {
 	async getAll(request: Request, response: Response){
 		const controller = new ShelterController(response.locals.user);
-		const result = await controller.getAll();
+		
+		const { page } = request.query;
+
+		const result = await controller.getAll(Number(page));
 
 		if(result.count === 0)
 			return response.status(200).json({mensagem: 'Não encontrado'});

@@ -4,6 +4,7 @@ import { IJoin, IUserSettings } from '../types/interfaces';
 import { getSelectableColumns } from '../utils/querybuilder';
 import { idReplacememtIsNotAllowed, isOwnerOrFail, isPropertyUpdateAllowedOrFail, isPutAllowedOrFail } from '../services/validations';
 import { assignProperties } from '../utils';
+import { PAGINATION } from '../config';
 
 export type settings = {
 	userSettings: IUserSettings,
@@ -123,7 +124,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		return getSelectableColumns(this.repository, this._alias, this._userSettings.permission.excluded, this._userSettings.permission.included);
 	}
 
-	private getQueryBuilder(selectAllEntity = false, selectAllRelations = false): SelectQueryBuilder<TEntity> {
+	private getQueryBuilder(selectAllEntity = false, selectAllRelations = false, paginate = false, page?: number): SelectQueryBuilder<TEntity> {
 		
 		const qb = this.repository.createQueryBuilder(this._alias);
 		
@@ -147,17 +148,29 @@ export default class Controller<TEntity extends ObjectLiteral> {
 			else
 				this._joinQuery.forEach(join => qb.leftJoin(join.property, join.alias, join.condition, join.parametes));
 
+			if(paginate){	
+				qb.take(10);
+				qb.skip(getOffSet(page));
+			}
+
+		}
+		else
+		{
+			if(paginate){
+				qb.limit(10);
+				qb.offset(getOffSet(page));
+			}
 		}
 		return qb;
 	}
 
-	async getAll() {
+	async getAll(page?: number) {
 		const whereOpt = [];
 		
 		if(this._userSettings.permission.ownershipRequired)
 			whereOpt.push({[this._ownerColumnName]: await this._fnGetOwnerIdByUserId(this._userSettings.id)});
 
-		const qb = this.getQueryBuilder();
+		const qb = this.getQueryBuilder(false, false, true, page? page : 1);
 
 		qb.where(whereOpt);
 
@@ -223,3 +236,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 			return await this.repository.remove(entity);
 	}
 }
+
+const getOffSet = (page = 1) => {
+	return page * PAGINATION - PAGINATION;
+};
