@@ -1,10 +1,13 @@
 import { ObjectLiteral, ObjectType, Repository, SelectQueryBuilder } from 'typeorm';
-import { dataSource } from '../database/datasource/data-source';
-import { IJoin, IUserSettings } from '../types/interfaces';
-import { getSelectableColumns } from '../utils/querybuilder';
-import { idReplacememtIsNotAllowed, isOwnerOrFail, isPropertyUpdateAllowedOrFail, isPutAllowedOrFail } from '../services/validations';
-import { assignProperties } from '../utils';
 import { PAGINATION } from '../config';
+import { dataSource } from '../database/datasource/data-source';
+import { Pet } from '../entities/Pet';
+import { User } from '../entities/User';
+import { idReplacememtIsNotAllowed, isOwnerOrFail, isPropertyUpdateAllowedOrFail, isPutAllowedOrFail } from '../services/validations';
+import { IJoin, IUserSettings } from '../types/interfaces';
+import { assignProperties } from '../utils';
+import { NotImplementedError } from '../utils/errors/code.errors';
+import { getSelectableColumns } from '../utils/querybuilder';
 
 export type settings = {
 	userSettings: IUserSettings,
@@ -202,7 +205,7 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		return await this.repository.save(entity);
 	}
 
-	async updateSome(body: object, id: string){	
+	async updateSome(body: object, id: string, file?: Express.Multer.File){	
 		let entity = await this.getQueryBuilder(true, true)
 			.where({[this._idColumnName] : id})
 			.getOneOrFail();
@@ -215,6 +218,21 @@ export default class Controller<TEntity extends ObjectLiteral> {
 		isPropertyUpdateAllowedOrFail(body, {permission: this._userSettings.permission} as IUserSettings, this._joinQuery.length);
 
 		entity = assignProperties(body, entity);
+		
+		if(file !== undefined){
+			if(entity['photo' as keyof TEntity] !== undefined){
+				(entity as unknown as Pet).photo = file.buffer;
+			}
+
+			else if(entity['user' as keyof TEntity] !== undefined){
+				(entity['user' as keyof TEntity] as User).photo = file.buffer;
+			}
+
+			else
+			{
+				throw new NotImplementedError();
+			}
+		}
 
 		return await this.repository.save(entity);
 	}
