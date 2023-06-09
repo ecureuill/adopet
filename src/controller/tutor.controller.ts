@@ -7,7 +7,6 @@ import { idReplacememtIsNotAllowed } from '../services/validations';
 import { Role } from '../types/enums';
 import { IUserSettings } from '../types/interfaces';
 import { ITutor, IUser } from '../types/schemas';
-import createHttpError from 'http-errors';
 import { SignUPEmailError } from '../utils/errors/business.errors';
 
 export default class TutorController extends Controller<Tutor> {
@@ -46,45 +45,53 @@ export default class TutorController extends Controller<Tutor> {
 		}
 	}
 
-	async updateAll(entity: Tutor, id: string) {
+	async getOneById(userId: string) {
+		const tutor = await Tutor.findOneByOrFail({userId : userId});
+
+		return super.getOneById(tutor.id);    
+	}
+	
+	async updateAll(entity: Tutor, userId: string) {
 		
-		const userEntity = await Tutor.findOneByOrFail({id : id});
+		const tutorEntity = await Tutor.findOneByOrFail({userId : userId});
 
 		if(entity.id === undefined || entity.id === '') 
-			entity.id = id;
+			entity.id = tutorEntity.id;
 		
 		if(entity.userId === undefined || entity.userId === '')
-			entity.userId = userEntity.userId;
+			entity.userId = tutorEntity.userId;
 
 		if(entity.user !== undefined && (entity.user.id === undefined || entity.user.id === ''))
-			entity.user.id = userEntity.userId;
+			entity.user.id = tutorEntity.userId;
 
 		if(entity.user?.password !== undefined)
 			entity.user.password = passwordToHash(entity.user.password);
 
-		idReplacememtIsNotAllowed(entity.userId, userEntity.userId);
-		idReplacememtIsNotAllowed(entity.user.id, userEntity.userId);
+		idReplacememtIsNotAllowed(entity.userId, tutorEntity.userId);
+		idReplacememtIsNotAllowed(entity.user.id, tutorEntity.userId);
 
-		return super.updateAll(entity, id);	
+		return super.updateAll(entity, tutorEntity.id);	
 	}
 
-	async updateSome(body: Partial<ITutor>, id: string) {
+	async updateSome(body: Partial<ITutor>, userId: string, file?: Express.Multer.File) {
 		
 		if((body as Tutor).user?.password !== undefined)
 			(body as Tutor).user.password = passwordToHash((body as Tutor).user.password);
 		
-		const userEntity = await Tutor.findOneByOrFail({id : id});
+		const tutorEntity = await Tutor.findOneByOrFail({userId : userId});
 
 		if(body.user !== undefined && (body.user as Partial<IUser>).id !== undefined)
-			idReplacememtIsNotAllowed(body.user?.id, userEntity.userId);
+			idReplacememtIsNotAllowed(body.user?.id, tutorEntity.userId);
 
 		if(body.userId !== undefined)
-			idReplacememtIsNotAllowed(body.userId, userEntity.userId);
+			idReplacememtIsNotAllowed(body.userId, tutorEntity.userId);
 
-		return super.updateSome(body, id);
+
+		return super.updateSome(body, tutorEntity.id, file);
 	}
 
-	async delete(id: string) {
-		return super.delete(id, true);
+	async delete(userId: string) {
+		const tutorEntity = await Tutor.findOneByOrFail({userId : userId});
+		return super.delete(tutorEntity.id, true);
 	}
 } 
