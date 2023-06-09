@@ -1,15 +1,16 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import TutorRouter from './tutor.router';
-import ShelterRouter from './shelter.router';
-import PetRouter from './pet.router';
-import { asyncHandler } from '../middlewares/asyncHandler';
+import { Request, Response, Router } from 'express';
+import multer from 'multer';
 import SchemaValidator from '../middlewares/SchemaValidator';
-import schemas from '../services/schemas';
-import UserRouter from './user.router';
-import { JWTVerify } from '../middlewares/jwt-middleware';
+import { asyncHandler } from '../middlewares/asyncHandler';
 import validatePermissions from '../middlewares/authorization-middleware';
-import { Resources, Actions } from '../utils/consts';
+import { JWTVerify } from '../middlewares/jwt-middleware';
+import schemas from '../services/schemas';
+import { Actions, Resources } from '../utils/consts';
 import AdoptionRouter from './adoption.router';
+import PetRouter from './pet.router';
+import ShelterRouter from './shelter.router';
+import TutorRouter from './tutor.router';
+import UserRouter from './user.router';
 
 export const router = Router();
 
@@ -24,6 +25,8 @@ const validator = new SchemaValidator(schemas);
 //TO-DO: fix captured params
 const uuidRegex = '(([A-z0-9]+-){4}[A-z0-9]+)';
 
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 
 router.get('/ping/', (request: Request, response: Response) => {
 	return response.json({
@@ -100,7 +103,7 @@ router.put(`/tutores/:id(${uuidRegex})`,
 );
 router.patch(`/tutores/:id(${uuidRegex})`, 
 	validatePermissions(Resources.TUTOR, Actions.UPDATE), 
-	validator.validate({schema: 'tutorSchema', data: 'body', strictRequiredChecks: false}),
+	upload.single('photo'),
 	asyncHandler(tutorRouter.updateSome)
 );
 router.delete(`/tutores/:id(${uuidRegex})`, 
