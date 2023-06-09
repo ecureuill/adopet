@@ -1,67 +1,105 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import PetController from '../controller/pet.controller';
 
 export default class PetRouter {
-	async getAll(request: Request, response: Response){
-		const controller = new PetController(response.locals.user);
+	async getAll(request: Request, response: Response, next: NextFunction){
+		try{
+
+			const controller = new PetController(response.locals.user);
 		
-		const { page } = request.query;
+			const { page } = request.query;
 
-		const result = await controller.getAll(Number(page));
+			const result = await controller.getAll(Number(page));
 
-		if(result.count === 0)
-			return response.status(200).json({mensagem: 'Não encontrado'});
+			if(result.count === 0)
+				return response.status(200).json({mensagem: 'Não encontrado'});
 
-		return response.status(200).json(result);
+			return response.status(200).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
-	async getOneById(request: Request, response: Response){
-		const controller = new PetController(response.locals.user);
+	async getOneById(request: Request, response: Response, next: NextFunction){
+		try{
 
-		const { id } = request.params;
+			const controller = new PetController(response.locals.user);
 
-		const result = await controller.getOneById(id);
+			const { id } = request.params;
 
-		return response.status(200).json(result);
+			const result = await controller.getOneById(id);
+
+			// result.shelter.user = await new UserController(response.locals.user).getOneById(result.shelter.userId);  
+
+			return response.status(200).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
-	async create(request: Request, response: Response){
-		const controller = new PetController(response.locals.user);
+	async create(request: Request, response: Response, next: NextFunction){
+		try{
 
-		const result = await controller.create(request.body);
+			const controller = new PetController(response.locals.user);
 
-		return response.status(201).json(result);
+			const result = await controller.create(request.body);
+
+			return response.status(201).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
-	async updateAll(request: Request, response: Response){
-		const controller = new PetController(response.locals.user);
+	async updateAll(request: Request, response: Response, next: NextFunction){
+		try{
 
-		const { id } = request.params;
+			const controller = new PetController(response.locals.user);
 
-		const result = await controller.updateAll(request.body, id);
+			const { id } = request.params;
 
-		return response.status(200).json(result);
+			const result = await controller.updateAll(request.body, id);
+
+			return response.status(200).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
-	async updateSome(request: Request, response: Response){
-		const controller = new PetController(response.locals.user);
+	async updateSome(request: Request, response: Response, next: NextFunction){
+		try{
 
-		const { id } = request.params;
+			const controller = new PetController(response.locals.user);
 
-		const result = await controller.updateSome(request.body, id);
+			const { id } = request.params;
 
-		return response.status(200).json(result);
+			const result = await controller.updateSome(request.body, id);
+
+			return response.status(200).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
-	async delete(request: Request, response: Response) {
-		const controller = new PetController(response.locals.user);
+	async delete(request: Request, response: Response, next: NextFunction) {
+		try{
 
-		const { id } = request.params;
+			const controller = new PetController(response.locals.user);
 
-		const result = await controller.delete(id);
+			const { id } = request.params;
 
-		return response.status(200).json(result);
+			const result = await controller.delete(id);
+
+			return response.status(200).json(result);
+		}
+		catch(error){
+			next(error);
+		}
 	}
 
 }
