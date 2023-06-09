@@ -100,6 +100,7 @@ const userSchema: JSONSchemaType<IUser> = {
 		phone: {$ref: 'definitionsSchema#/definitions/phone'},
 		city: {$ref: 'definitionsSchema#/definitions/non-empty-string'},
 		state: {$ref: 'definitionsSchema#/definitions/state'},
+		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 	},
 	additionalProperties: false,
@@ -113,7 +114,6 @@ export const tutorSchema: JSONSchemaType<ITutor> = {
 	properties: {
 		id: { $ref: 'definitionsSchema#/definitions/uuid'},
 		about: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
-		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		user: userSchema,
 		delete_date: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		userId: { $ref: 'definitionsSchema#/definitions/uuid'},
@@ -153,7 +153,7 @@ export const petSchema: JSONSchemaType<IPet> = {
 			enum: ['dog', 'cat']
 		},
 		adopted: {type: 'boolean'},
-		photo: {type: 'string', nullable: true},
+		photo: {$ref: 'definitionsSchema#/definitions/non-nullable-empty-string'},
 		shelterId: {
 			type: 'string',
 			format: 'uuid'

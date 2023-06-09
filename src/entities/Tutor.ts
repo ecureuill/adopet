@@ -8,9 +8,6 @@ export class Tutor extends BaseEntity implements ITutor {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	@Column({type: 'bytea', nullable: true})
-	photo: Buffer;
-
 	@Column('text', {nullable: true})
 	about: string;
 

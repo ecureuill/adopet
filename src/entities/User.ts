@@ -32,6 +32,9 @@ export class User extends BaseEntity implements IUser {
 	@Column({nullable: true})
 	state: string;
 
+	@Column({type: 'bytea', nullable: true})
+	photo: Buffer;
+
 	@DeleteDateColumn()
 	delete_date: string;
 

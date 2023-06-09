@@ -9,6 +9,7 @@ export interface IUser {
 	phone?: string;
 	city?: string;
 	state?: string;
+	photo?: string | Buffer | null,
 	delete_date?: string | null;
 }
 
@@ -30,7 +31,6 @@ export interface IPet {
 export interface ITutor {
 	id: `${string}-${string}-${string}-${string}-${string}` | string;
 	userId: `${string}-${string}-${string}-${string}-${string}` | string,
-	photo?: string | Buffer,
 	about?: string,
 	user: IUser
 	delete_date?: string | null;
