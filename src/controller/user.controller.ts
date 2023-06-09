@@ -41,7 +41,10 @@ export default class UserController extends Controller<User> {
 		if(!passwordCompareHash(password, entity.password))
 			throw new SignInLoginError();
 
-		return createJwtToken({id: entity.id, role: entity.role});
+		return {
+			user: entity,
+			token: createJwtToken({id: entity.id, role: entity.role})
+		};
 	}
 
 	async create(user: User, role: Role = Role.ADMIN) {
