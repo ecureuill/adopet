@@ -20,6 +20,10 @@ export default class PetController extends Controller<Pet> {
 				{
 					property: 'pet.shelter',
 					alias: 'shelter',
+				},
+				{
+					property: 'shelter.user',
+					alias: 'user'
 				}
 			],
 			checkPetOwner,

@@ -14,7 +14,10 @@ const getRelationColumns = (relations: RelationMetadata[], condition: (column: s
 			if(condition(columnName, relation.propertyName))
 				previous.push(columnName);
 		});
-
+		
+		const subrelation = relation.inverseEntityMetadata.ownRelations.filter(r => r.propertyName === 'user');
+		previous.push(...getRelationColumns(subrelation, condition));
+	
 		return previous;
 
 	}, []);
