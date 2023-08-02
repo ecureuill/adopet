@@ -1,0 +1,1007 @@
+openapi: '3.0.3'
+info:
+  title: Adopet API
+  description: API developed as result of ***6th Backend Alura Challenge*** 
+  version: '1.0'
+  contact:
+    name: Camilla
+    email: logikasciuro@gmail.com
+    url: github.com/ecureuill
+
+externalDocs:
+  description: Find more in github repository
+  url: http://github.com/ecureuill/adopet
+
+servers:
+  - url: http://localhost:3001
+    description: Development Server
+tags:
+  - name: Signup
+  - name: Login
+  - name: Users
+  - name: Pets
+  - name: Tutors
+  - name: Shelters
+  - name: Adoption
+paths:    
+  /ping:
+    get:
+      summary: Get a pong
+      description: Get a pong
+      responses:
+        200:
+          description: A pong
+          content: 
+            text/plain:
+              schema:
+                type: string
+      security: []
+  /signup:
+    summary: Signup as admin
+    post:
+      tags:
+        - Signup
+      summary: Signup as admin
+      security: []
+      requestBody: 
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/signup.request'
+      responses:
+        '201':
+          description: A user to be returned
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup.response'
+        '400': 
+          $ref: '#/components/responses/400'
+  /signup/tutores:
+    summary: Signup as tutor
+    post:
+      tags:
+        - Signup
+      summary: Signup as tutor
+      security: []
+      requestBody: 
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/signup.request'
+      responses:
+        '201':
+          description: A user to be returned
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup.response'
+        '400': 
+          $ref: '#/components/responses/400'
+  /signup/abrigos:
+    summary: Signup as shelter
+    post:
+      tags:
+        - Signup
+      summary: Signup as shelter
+      security: []
+      requestBody: 
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/signup.request'
+      responses:
+        '201':
+          description: A user to be returned
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup.response'
+        '400': 
+          $ref: '#/components/responses/400'
+  /login:
+    summary: Login
+    description: Login as tutor, shelter or admin
+    post:
+      tags:
+        - Login
+      summary: Login
+      security: []
+      requestBody: 
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/login.request'
+      responses:
+        '201':
+          description: An user and json web token to be returned
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/login.response'
+        401:
+          $ref: '#/components/responses/401'
+        500:
+          $ref: '#/components/responses/500'
+  /users:
+    summary: Users
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      responses:
+        200:
+          description: A list of users to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/user.response'  
+        401:
+          $ref: '#/components/responses/401'
+        500:
+          $ref: '#/components/responses/500'
+  /users/{id}:
+    summary: User
+    get:
+      tags:
+        - Users
+      summary: Get one user by id
+      responses:
+        200:
+          description: An user to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/user.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - Users
+      summary: Update one user by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/user.request'
+      responses:
+        200:
+          description: An user to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/user.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      tags:
+        - Users
+      summary: Update one user by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/user.request'
+      responses:
+        200:
+          description: An user to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/user.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Users
+      summary: Delete one user by id
+      responses:
+        204:
+          description: No Content
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/user.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    parameters:
+      - name: id
+        in: path
+        description: ID of user to use
+        required: true
+        schema:
+          type: integer
+        style: simple
+  /tutores:
+    summary: Tutors
+    get:
+      tags:
+        - Tutors
+      summary: Get all tutors
+      responses:
+        200:
+          description: A list of tutors to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/tutor.response'
+        401:
+          $ref: '#/components/responses/401'
+        500:
+          $ref: '#/components/responses/500'
+  /tutores/{id}:
+    summary: Tutor
+    get:
+      tags:
+        - Tutors
+      summary: Get one tutor by id
+      responses:
+        200:
+          description: A tutor to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/tutor.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+  
+    put:
+      tags:
+        - Tutors
+      summary: Update one tutor by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/tutor.request'
+      responses:
+        200:
+          description: A tutor to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/tutor.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      tags:
+        - Tutors
+      summary: Update one tutor by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/tutor.request'
+      responses:
+        200:
+          description: An tutor to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/tutor.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Tutors
+      summary: Delete one tutor by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/tutor.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    parameters:
+      - name: id
+        in: path
+        description: ID of tutor to use
+        required: true
+        schema:
+          type: integer
+        style: simple
+  /abrigos:
+    summary: Shelters
+    get:
+      tags:
+        - Shelters
+      summary: Get all shelters
+      responses:
+        200:
+          description: A list of shelters to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/shelters.response'
+  /abrigos/{id}:
+    summary: Shelter
+    get:
+      tags:
+        - Shelters
+      summary: Get one shelter by id
+      responses:
+        200:
+          description: A shelter to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/shelter.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - Shelters
+      summary: Update one shelter by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/shelter.request'
+      responses:
+        200:
+          description: A shelter to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/shelter.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      tags:
+        - Shelters
+      summary: Update one shelter by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/shelter.request'
+      responses:
+        200:
+          description: An shelter to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/shelter.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Shelters
+      summary: Delete one shelter by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/shelter.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    parameters:
+      - name: id
+        in: path
+        description: ID of shelter to use
+        required: true
+        schema:
+          type: integer
+        style: simple
+  /pets:
+    summary: Pets
+    get:
+      tags:
+        - Pets
+      summary: Get all pets
+      responses:
+        200:
+          description: A list of pets to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#components/schemas/pets.response'
+        500:
+          $ref: '#/components/responses/500'
+  /pets/{id}:
+    summary: Pet
+    get:
+      tags:
+        - Pets
+      summary: Get one pet by id
+      responses:
+        200:
+          description: A pet to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/pet.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - Pets
+      summary: Update one pet by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/pet.request'
+      responses:
+        200:
+          description: An pet to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/pet.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    patch:
+      tags:
+        - Pets
+      summary: Update one pet by id
+      parameters: []
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/pet.request'
+      responses:
+        200:
+          description: An pet to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/pet.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Pets
+      summary: Delete one pet by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/pet.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+    parameters:
+      - name: id
+        in: path
+        description: ID of pet to use
+        required: true
+        schema:
+          type: integer
+        style: simple
+  /adocoes:
+    summary: Adocoes
+    get:
+      tags:
+        - Adoptions
+      summary: Get all adocoes
+      responses:
+        200:
+          description: A list of adocoes to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/adoptions.response'
+        401:
+          $ref: '#/components/responses/401'
+        500:
+          $ref: '#/components/responses/500'
+  /adocoes/{id}:
+    summary: Adoption
+    get:
+      tags:
+        - Adoptions
+      summary: Get one adoption by id
+      security: []
+      responses:
+        200:
+          description: An adoption to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/adoption.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - Adoptions
+      summary: Create one adoption by id
+      requestBody:
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/adoption.request'
+      responses:
+        200:
+          description: An adoption to be returned
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/adoption.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Adoptions
+      summary: Cancel one adoption by id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/adoption.response'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+    parameters:
+      - name: id
+        in: path
+        description: ID of adoption to use
+        required: true
+        schema:
+          type: integer
+        style: simple
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT Authorization header using the Bearer scheme.
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#component/schemas/error'
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#component/schemas/error'
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#component/schemas/error'
+    500:
+      description: Unexpected Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#component/schemas/error'
+  schemas:
+    adoptions.response:
+      title: Adocoes
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/adoption.response'
+    adoption.response:
+      title: Adocao (Response Body)
+      type: object
+      properties:
+        petId:
+          type: string
+        pet:
+          $ref: '#/components/schemas/pet.response'
+        tutorId:
+          type: string
+        tutor:
+          $ref: '#/components/schemas/tutor.response'
+    adoption.request:
+      title: Adocao (Request Body)
+      type: object
+      properties:
+        petId:
+          type: string
+        tutorId:
+          type: string
+      required:
+        - petId
+        - tutorId
+    pets.response:
+      title: Pets
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/pet.response'
+    pet.response:
+      title: Pet (Response Body)
+      type: object
+      properties:
+        id:
+          type: string
+        name: 
+          type: string
+        age:
+          type: integer
+        age_unit:
+          type: string
+        size_variety:
+          type: string
+        type:
+          type: string
+        adopted:
+          type: boolean
+        photo: 
+          $ref: '#/components/schemas/photo'
+        shelterId:
+          type: string  
+        delete_date:
+          type: string
+          format: date-time
+    pet.request:
+      title: Pet (Request Body)
+      type: object
+      properties:
+        name: 
+          type: string
+        age:
+          type: integer
+        age_unit:
+          type: string
+        size_variety:
+          type: string
+        type:
+          type: string 
+    shelters.response:
+      title: Shelters
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/shelter.response'
+    shelter.response:
+      title: Shelter (Response Body)
+      type: object
+      properties:
+        id:
+          type: string
+        about: 
+          type: string
+        user:
+          $ref: '#/components/schemas/user.response'
+        userId:
+          type: string
+        pets:
+          $ref: '#/components/schemas/pet.response'
+        delete_date:
+          type: string
+          format: date-time
+    shelter.request:
+      title: Shelter (Request Body)
+      type: object
+      properties:
+        about: 
+          type: string
+        pets:
+          $ref: '#/components/schemas/pet.response'
+    tutors.response:
+      title: List of Tutors
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/tutor.response'
+    tutor.response:
+      title: Tutor (Response Body)
+      type: object
+      properties:
+        id:
+          type: string
+        about: 
+          type: string
+        user:
+          $ref: '#/components/schemas/user.response'
+        userId:
+          type: string
+        delete_date:
+          type: string
+          format: date-time
+    tutor.request:
+      title: Tutor (Request Body)
+      type: object
+      properties:
+        about: 
+          type: string  
+    user.response:
+      title: User (Response Body)
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+        name:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        photo:
+          title: Photo
+          type: object
+          properties:
+            type:
+              type: string
+            data:
+              type: array
+              items:
+                type: integer
+          required:
+            - type
+            - data
+          additionalProperties: false
+        delete_date:
+          type: string
+          format: date-time
+    user.request:
+      title: User
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+        name:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        photo:
+          $ref: '#/components/schemas/photo'
+    login.response:
+      title: Login response
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/user.response'
+        token:
+          type: string
+    login.request:
+      title: Login
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+    signup.response:
+      title: User (signup response)
+      type: object
+      required:
+          - email
+          - password
+          - name
+          - role
+          - phone
+          - city
+          - state
+          - delete_date
+          - id
+      properties:
+          email:
+            type: string
+          password:
+            type: string
+            format: password
+          name:
+            type: string
+          role:
+            type: string
+          phone:
+            type: string
+          city:
+            type: string
+          state:
+            type: string
+          delete_date:
+            type: string
+            format: date-time
+          id:
+            type: string
+    signup.request:
+      title: Signup
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+        name:
+          type: string
+    photo:
+      type: object
+      properties:
+        type:
+          type: string
+        data:
+          type: array
+          items:
+            type: integer
+      required:
+        - type
+        - data
+      additionalProperties: false
+    error:
+      title: Error
+      properties:
+        name: 
+          type: string
+        message: 
+          type: string
+        params:
+          type: object
+          properties:
+            additionalProperty:
+              type: string
+            message:
+              type: string

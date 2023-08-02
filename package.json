@@ -67,6 +67,9 @@
     "multer": "^1.4.5-lts.1",
     "pg": "^8.4.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.3.14"
+    "swagger-ui-dist": "^5.3.1",
+    "swagger-ui-express": "^5.0.0",
+    "typeorm": "^0.3.14",
+    "yamljs": "^0.3.0"
   }
 }
