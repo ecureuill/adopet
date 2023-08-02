@@ -1,0 +1,152 @@
+summary: Shelter
+get:
+  summary: Get one shelter by id
+  responses:
+    200:
+      description: A shelter to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/shelter.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+put:
+  summary: Update one shelter by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/shelter.request.schema.yml
+  responses:
+    200:
+      description: A shelter to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/shelter.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+patch:
+  summary: Update one shelter by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/shelter.request.schema.yml
+  responses:
+    200:
+      description: An shelter to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/shelter.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+delete:
+  summary: Delete one shelter by id
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/shelter.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+parameters:
+  - name: id
+    in: paths
+    description: ID of shelter to use
+    required: true
+    schema:
+      type: integer
+    style: simple

@@ -1,0 +1,13 @@
+title: Photo
+type: object
+properties:
+  type:
+    type: string
+  data:
+    type: array
+    items:
+      type: integer
+required:
+  - type
+  - data
+additionalProperties: false

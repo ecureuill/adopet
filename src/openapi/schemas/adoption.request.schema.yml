@@ -1,0 +1,11 @@
+name: Adocao
+title: Adocao (Request Body)
+type: object
+properties:
+  petId:
+    type: string
+  tutorId:
+    type: string
+required:
+  - petId
+  - tutorId

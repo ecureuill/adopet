@@ -1,0 +1,19 @@
+name: User
+title: User (Request Body)
+type: object
+properties:
+  email:
+    type: string
+  password:
+    type: string
+    format: password
+  name:
+    type: string
+  phone:
+    type: string
+  city:
+    type: string
+  state:
+    type: string
+  photo:
+    $ref: ./photo.schema.yml

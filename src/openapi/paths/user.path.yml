@@ -1,0 +1,152 @@
+summary: User
+get:
+  summary: Get one user by id
+  responses:
+    200:
+      description: An user to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/user.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+put:
+  summary: Update one user by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/user.request.schema.yml
+  responses:
+    200:
+      description: An user to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/user.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+patch:
+  summary: Update one user by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/user.request.schema.yml
+  responses:
+    200:
+      description: An user to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/user.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+delete:
+  summary: Delete one user by id
+  responses:
+    204:
+      description: No Content
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/user.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+parameters:
+  - name: id
+    in: paths
+    description: ID of user to use
+    required: true
+    schema:
+      type: integer
+    style: simple

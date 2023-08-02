@@ -1,0 +1,12 @@
+name: Adocao
+title: Adocao (Response Body)
+type: object
+properties:
+  petId:
+    type: string
+  pet:
+    $ref: ./pet.response.schema.yml
+  tutorId:
+    type: string
+  tutor:
+    $ref: ./tutor.response.schema.yml

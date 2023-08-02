@@ -1,0 +1,116 @@
+summary: Adoption
+get:
+  summary: Get one adoption by id
+  securitySchemes:
+    bearerAuth: []
+  responses:
+    200:
+      description: An adoption to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/adoption.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+post:
+  summary: Create one adoption by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/adoption.request.schema.yml
+  responses:
+    200:
+      description: An adoption to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/adoption.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+delete:
+  summary: Cancel one adoption by id
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/adoption.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+parameters:
+  - name: id
+    in: paths
+    description: ID of adoption to use
+    required: true
+    schema:
+      type: integer
+    style: simple

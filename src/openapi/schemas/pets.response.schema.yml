@@ -1,0 +1,11 @@
+name: List of Pets
+title: Pets
+type: object
+properties:
+  count:
+    type: integer
+    format: int32
+  entities:
+    type: array
+    items:
+      $ref: ./pet.response.schema.yml

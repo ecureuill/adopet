@@ -1,0 +1,26 @@
+name: User
+title: User (Response Body)
+type: object
+properties:
+  id:
+    type: string
+  role:
+    type: string
+  email:
+    type: string
+  password:
+    type: string
+    format: password
+  name:
+    type: string
+  phone:
+    type: string
+  city:
+    type: string
+  state:
+    type: string
+  photo:
+    $ref: ./photo.schema.yml
+  delete_date:
+    type: string
+    format: date-time

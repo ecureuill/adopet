@@ -1,0 +1,65 @@
+openapi: '3.0.3'
+info:
+  title: Adopet API
+  description: API developed as result of ***6th Backend Alura Challenge*** 
+  version: '1.0'
+  contact:
+    name: Camilla
+    email: logikasciuro@gmail.com
+    url: github.com/ecureuill
+externalDocs:
+  description: Find more in github repository
+  url: http://github.com/ecureuill/adopet
+servers:
+  - url: http://localhost:3001
+    description: Development Server
+paths:    
+  /ping:
+    get:
+      summary: Get a pong
+      description: Get a pong
+      responses:
+        200:
+          description: A pong
+          content: 
+            text/plain:
+              schema:
+                type: string
+      security: []
+  /signup:
+    $ref: ./paths/signup.path.yml
+  /signup/tutores:
+    $ref: ./paths/signup.path.yml
+  /signup/abrigos:
+    $ref: ./paths/signup.path.yml
+  /login:
+    $ref: ./paths/login.path.yml
+  /users:
+    $ref: ./paths/users.path.yml
+  /users/{id}:
+    $ref: ./paths/user.path.yml
+  /tutores:
+    $ref: ./paths/tutores.path.yml
+  /tutores/{id}:
+    $ref: ./paths/tutor.path.yml
+  /abrigos:
+    $ref: ./paths/abrigos.path.yml
+  /abrigos/{id}:
+    $ref: ./paths/abrigo.path.yml
+  /pets:
+    $ref: ./paths/pets.path.yml
+  /pets/{id}:
+    $ref: ./paths/pet.path.yml  
+  /adocoes:
+    $ref: ./paths/adocoes.path.yml
+  /adocoes/{id}:
+    $ref: ./paths/adocao.path.yml
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT Authorization header using the Bearer scheme.
+      scheme: bearer
+      bearerFormat: JWT

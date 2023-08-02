@@ -1,0 +1,35 @@
+summary: Login
+description: Login as tutor, shelter or admin
+post:
+  summary: Login
+  security: []
+  parameters: []
+  requestBody: 
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/login.request.schema.yml
+  responses:
+    '201':
+      description: An user and json web token to be returned
+      content: 
+        application/json:
+          schema: 
+            $ref: ../schemas/login.response.schema.yml
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Unexpected Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+
+    
+
+ 

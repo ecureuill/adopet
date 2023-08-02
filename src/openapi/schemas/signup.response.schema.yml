@@ -1,0 +1,34 @@
+name: Signup Response body
+title: User (signup response)
+type: object
+required:
+    - email
+    - password
+    - name
+    - role
+    - phone
+    - city
+    - state
+    - delete_date
+    - id
+properties:
+    email:
+      type: string
+    password:
+      type: string
+      format: password
+    name:
+      type: string
+    role:
+      type: string
+    phone:
+      type: string
+    city:
+      type: string
+    state:
+      type: string
+    delete_date:
+      type: string
+      format: date-time
+    id:
+      type: string

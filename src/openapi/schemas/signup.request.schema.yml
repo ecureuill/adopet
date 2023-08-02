@@ -1,0 +1,15 @@
+name: Signup request body
+title: Signup
+type: object
+required:
+  - email
+  - password
+  - name
+properties:
+  email:
+    type: string
+  password:
+    type: string
+    format: password
+  name:
+    type: string

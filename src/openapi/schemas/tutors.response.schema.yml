@@ -1,0 +1,11 @@
+name: List of Tutors
+title: Tutors
+type: object
+properties:
+  count:
+    type: integer
+    format: int32
+  entities:
+    type: array
+    items:
+      $ref: ./tutor.response.schema.yml

@@ -1,0 +1,152 @@
+summary: Tutor
+get:
+  summary: Get one tutor by id
+  responses:
+    200:
+      description: A tutor to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/tutor.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+put:
+  summary: Update one tutor by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/tutor.request.schema.yml
+  responses:
+    200:
+      description: A tutor to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/tutor.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+patch:
+  summary: Update one tutor by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/tutor.request.schema.yml
+  responses:
+    200:
+      description: An tutor to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/tutor.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+delete:
+  summary: Delete one tutor by id
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/tutor.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+parameters:
+  - name: id
+    in: paths
+    description: ID of tutor to use
+    required: true
+    schema:
+      type: integer
+    style: simple

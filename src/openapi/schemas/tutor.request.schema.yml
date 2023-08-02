@@ -1,0 +1,6 @@
+name: Tutor
+title: Tutor (Request Body)
+type: object
+properties:
+  about: 
+    type: string

@@ -1,0 +1,14 @@
+title: Error Model
+type: object
+properties:
+  name: 
+    type: string
+  message: 
+    type: string
+  params:
+    type: object
+    properties:
+      additionalProperty:
+        type: string
+      message:
+        type: string

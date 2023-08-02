@@ -1,0 +1,11 @@
+name: List of Users
+title: Users
+type: object
+properties:
+  count:
+    type: integer
+    format: int32
+  entities:
+    type: array
+    items:
+      $ref: ./user.full.schema.yml

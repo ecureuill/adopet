@@ -1,0 +1,17 @@
+name: Shelter
+title: Shelter (Response Body)
+type: object
+properties:
+  id:
+    type: string
+  about: 
+    type: string
+  user:
+    $ref: ./user.response.schema.yml
+  userId:
+    type: string
+  pets:
+    $ref: ./pet.response.schema.yml
+  delete_date:
+    type: string
+    format: date-time

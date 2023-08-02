@@ -1,0 +1,15 @@
+name: Tutor
+title: Tutor (Response Body)
+type: object
+properties:
+  id:
+    type: string
+  about: 
+    type: string
+  user:
+    $ref: ./user.response.schema.yml
+  userId:
+    type: string
+  delete_date:
+    type: string
+    format: date-time

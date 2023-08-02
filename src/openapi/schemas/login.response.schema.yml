@@ -1,0 +1,8 @@
+name: Login (Response body)
+title: Login response
+type: object
+properties:
+  user:
+    $ref: ./user.response.schema.yml
+  token:
+    type: string

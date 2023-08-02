@@ -1,0 +1,153 @@
+summary: Pet
+get:
+  summary: Get one pet by id
+  responses:
+    200:
+      description: A pet to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/pet.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+put:
+  summary: Update one pet by id
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/pet.request.schema.yml
+  responses:
+    200:
+      description: An pet to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/pet.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+patch:
+  summary: Update one pet by id
+  parameters: []
+  requestBody:
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/pet.request.schema.yml
+  responses:
+    200:
+      description: An pet to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/pet.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+delete:
+  summary: Delete one pet by id
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/pet.response.schema.yml
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+parameters:
+  - name: id
+    in: paths
+    description: ID of pet to use
+    required: true
+    schema:
+      type: integer
+    style: simple

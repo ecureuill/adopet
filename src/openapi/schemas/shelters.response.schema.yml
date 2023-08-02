@@ -1,0 +1,11 @@
+name: List of Shelters
+title: Shelters
+type: object
+properties:
+  count:
+    type: integer
+    format: int32
+  entities:
+    type: array
+    items:
+      $ref: ./shelter.response.schema.yml

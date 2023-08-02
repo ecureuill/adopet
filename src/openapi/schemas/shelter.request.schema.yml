@@ -1,0 +1,8 @@
+name: Shelter
+title: Shelter (Request Body)
+type: object
+properties:
+  about: 
+    type: string
+  pets:
+    $ref: ./pet.request.schema.yml

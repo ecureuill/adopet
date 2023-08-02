@@ -1,0 +1,22 @@
+summary: Shelters
+get:
+  summary: Get all shelters
+  responses:
+    200:
+      description: A list of shelters to be returned
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/shelters.response.schema.yml
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Unexpected Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml

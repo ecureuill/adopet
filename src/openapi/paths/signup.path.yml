@@ -1,0 +1,34 @@
+summary: Signup options
+description: Signup as tutor, shelter or admin
+post:
+  summary: Signup as admin
+  security: []
+  parameters: []
+  requestBody: 
+    content: 
+      application/json:
+        schema: 
+          $ref: ../schemas/signup.request.schema.yml
+  responses:
+    '201':
+      description: A user to be returned
+      content: 
+        application/json:
+          schema: 
+            $ref: ../schemas/signup.response.schema.yml
+    '400':
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+    500:
+      description: Unexpected Error
+      content:
+        application/json:
+          schema: 
+            $ref: ../schemas/error.schema.yml
+
+    
+
+ 

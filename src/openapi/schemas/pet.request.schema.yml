@@ -1,0 +1,14 @@
+name: Pet
+title: Pet (Request Body)
+type: object
+properties:
+  name: 
+    type: string
+  age:
+    type: integer
+  age_unit:
+    type: string
+  size_variety:
+    type: string
+  type:
+    type: string 

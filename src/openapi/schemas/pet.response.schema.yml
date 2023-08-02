@@ -1,0 +1,25 @@
+name: Pet 
+title: Pet (Response Body)
+type: object
+properties:
+  id:
+    type: string
+  name: 
+    type: string
+  age:
+    type: integer
+  age_unit:
+    type: string
+  size_variety:
+    type: string
+  type:
+    type: string
+  adopted:
+    type: boolean
+  photo: 
+    $ref: ./photo.schema.yml
+  shelterId:
+    type: string  
+  delete_date:
+    type: string
+    format: date-time
