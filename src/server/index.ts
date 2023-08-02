@@ -4,7 +4,6 @@ import cors from 'cors';
 import { router } from '../routers';
 import { handleError } from '../middlewares/error-handlers/handlerError';
 import { handleTypeORMError } from '../middlewares/error-handlers/handleTypeORMError';
-import { handleSchemaError } from '../middlewares/error-handlers/handleSchemaError';
 
 dotenv.config();
 export const app = express();
@@ -15,7 +14,6 @@ app.use(cors());
 
 app.use(router);
 
-app.use(handleSchemaError);
 app.use(handleTypeORMError);
 app.use(handleError);
 

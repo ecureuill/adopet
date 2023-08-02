@@ -64,7 +64,7 @@ const petPermission: IRule = {
 			roles: [Role.ADMIN],
 			ownership: false,
 			attributes: {
-				included: ['*', 'shelter.*']
+				included: ['*', 'shelter.*', 'user.*']
 			}
 		},
 		{

@@ -1,4 +1,4 @@
-import { NotImplementedError } from "./errors/code.errors";
+import { NotImplementedError } from './errors/code.errors';
 
 export interface Variant {
 	[key: string]: string | Buffer;

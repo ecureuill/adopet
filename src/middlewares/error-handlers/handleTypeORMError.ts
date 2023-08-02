@@ -8,16 +8,14 @@ export const handleTypeORMError = (error: TypeORMError, request: Request, respon
 
 	if (error instanceof EntityNotFoundError)
 		return response.status(HTTP_RESPONSE.BadRequest).json(Flatted.parse(Flatted.stringify({
-			error_name: error.name,
-			error_msg: error.message,
+			name: error.name,
 			message: 'Resource do not exist'
 
 		})));
 
 	if(error instanceof TypeORMError)
 		return response.status(HTTP_RESPONSE.InternalServerError).json(Flatted.parse(Flatted.stringify({
-			error_name: `TypeORMErrorGENERIC ${error.name}`,
-			error_msg: error.message,
+			name: `TypeORMErrorGENERIC ${error.name}`,
 			message: error.message
 
 		})));

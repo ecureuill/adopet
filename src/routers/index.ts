@@ -29,12 +29,7 @@ const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
 router.get('/ping/', (request: Request, response: Response) => {
-	return response.json({
-		pong: {
-			params: request.params,
-			body: request.body
-		}
-	});
+	return response.send('pong');
 });
 
 router.post('/login',
@@ -143,11 +138,6 @@ router.get(`/adocoes/:id(${uuidRegex})`,
 	asyncHandler(adoptionRouter.getOneById)
 );
 router.post('/adocoes', 
-	validatePermissions(Resources.ADOPTION, Actions.CREATE), 
-	validator.validate({schema: 'adoptionSchema', data: 'body'}),
-	asyncHandler(adoptionRouter.create)
-);
-router.post(`/adocoes/:id(${uuidRegex})`, 
 	validatePermissions(Resources.ADOPTION, Actions.CREATE), 
 	validator.validate({schema: 'adoptionSchema', data: 'body'}),
 	asyncHandler(adoptionRouter.create)
